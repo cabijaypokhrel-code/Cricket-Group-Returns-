@@ -172,6 +172,7 @@ var S = {
   activeTab:'live',
   snapshots:[],
   inn1batting:[],inn1bowling:[],inn1fow:[],inn1overHistory:[],inn1score:null,
+  battingOrder:[],inn1battingOrder:[],
   bowlerConfirmed:false,
   dismissalPending:false, dismissalType:'',
   thisBallsRunout:[],
@@ -183,7 +184,7 @@ function saveSnapshot(){
     t1:S.t1,t2:S.t2,
     batting:S.batting,bowling:S.bowling,
     strikerIdx:S.strikerIdx,nonStrikerIdx:S.nonStrikerIdx,bowlerIdx:S.bowlerIdx,
-    thisBalls:S.thisBalls,thisBallsRunout:S.thisBallsRunout.slice(),overHistory:S.overHistory,overBowlers:S.overBowlers.slice(),fow:S.fow,
+    thisBalls:S.thisBalls,thisBallsRunout:S.thisBallsRunout.slice(),overHistory:S.overHistory,overBowlers:S.overBowlers.slice(),fow:S.fow,battingOrder:S.battingOrder.slice(),
     wicketPending:S.wicketPending,outIdx:S.outIdx,
     overDone:S.overDone,innings:S.innings
   }));
@@ -199,6 +200,7 @@ function undoLast(){
   S.thisBalls=prev.thisBalls; S.thisBallsRunout=prev.thisBallsRunout||[]; S.overHistory=prev.overHistory; S.overBowlers=prev.overBowlers||[]; S.fow=prev.fow;
   S.wicketPending=prev.wicketPending; S.outIdx=prev.outIdx;
   S.overDone=prev.overDone; S.innings=prev.innings;
+  S.battingOrder=prev.battingOrder||S.battingOrder;
   S.extrasPanel=null; S.editStriker=false; S.editBowler=false; S.confirmEndInnings=false;
   render();
 }
@@ -380,6 +382,7 @@ function endInnings(){
     S.inn1overHistory=JSON.parse(JSON.stringify(S.overHistory));
     S.inn1overBowlers=S.overBowlers.slice();
     S.inn1score=JSON.parse(JSON.stringify(S.t1));
+    S.inn1battingOrder=S.battingOrder.slice();
     S.innings=2;
 
     // Inn.2: the team that was BOWLING in Inn.1 now BATS
@@ -394,6 +397,7 @@ function endInnings(){
     S.batting  = newBatters;
     S.bowling  = newBowlers;
     S.strikerIdx=0; S.nonStrikerIdx=1; S.bowlerIdx=0;
+    S.battingOrder=[0,1];
     S.thisBalls=[]; S.overHistory=[]; S.overBowlers=[]; S.fow=[];
     S.wicketPending=false; S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null;
     S.snapshots=[]; S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[];
@@ -428,8 +432,13 @@ function exportPDF(){
           :s2.runs>s1.runs?bat2+' won by '+(10-s2.wickets)+' wickets'
           :'Match tied!';
   }
-  function batRows(arr){
-    return arr.map(function(b){
+  function batRows(arr, orderArr){
+    var order=orderArr||[];
+    var notBatted=[];
+    for(var ii=0;ii<arr.length;ii++){ if(order.indexOf(ii)<0) notBatted.push(ii); }
+    var sortedIdxs=order.concat(notBatted);
+    return sortedIdxs.map(function(i){
+      var b=arr[i];
       var status, statusColor;
       if(b.out){ status=b.howOut; statusColor='#791F1F'; }
       else if(b.retiredHurt){ status='retired hurt'; statusColor='#aaa'; }
@@ -481,14 +490,14 @@ function exportPDF(){
       ((S.innings===2||S.phase==='result')?'<div class="sum-box"><h3>'+bat2+' (Inn. 2)</h3><div class="sum-score">'+s2.runs+'/'+s2.wickets+'</div><div class="sum-detail">'+overs(s2)+' overs &nbsp;|&nbsp; RR: '+rr(s2)+'</div></div>':'')+
     '</div>'+
     '<h2>'+bat1+' &mdash; Batting</h2>'+
-    '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b1)+'</table>'+
+    '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b1,S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder)+'</table>'+
     '<div class="extras">Extras: Wide '+s1.wide+' &nbsp; No Ball '+s1.nb+' &nbsp; Total '+s1.runs+'/'+s1.wickets+' ('+overs(s1)+' ov)</div>'+
     (fow1.length?'<h2>Fall of Wickets &mdash; '+bat1+'</h2><table><tr><th>Wkt</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+fowRows(fow1)+'</table>':'')+
     '<h2>'+bat2+' &mdash; Bowling (Inn. 1)</h2>'+
     '<table><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>'+bowlRows(bw1)+'</table>'+
     (b2.length?
       '<h2>'+bat2+' &mdash; Batting</h2>'+
-      '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b2)+'</table>'+
+      '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b2,S.battingOrder)+'</table>'+
       '<div class="extras">Extras: Wide '+s2.wide+' &nbsp; No Ball '+s2.nb+' &nbsp; Total '+s2.runs+'/'+s2.wickets+' ('+overs(s2)+' ov)</div>'+
       (fow2.length?'<h2>Fall of Wickets &mdash; '+bat2+'</h2><table><tr><th>Wkt</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+fowRows(fow2)+'</table>':'')+
       '<h2>'+bat1+' &mdash; Bowling (Inn. 2)</h2>'+
@@ -515,6 +524,8 @@ function confirmNewBatsman(){
   } else {
     S.batting[nextIdx].name=name;
   }
+  // Track batting arrival order
+  if(S.battingOrder.indexOf(nextIdx)<0) S.battingOrder.push(nextIdx);
   // Assign to the correct position (striker or non-striker)
   if(S.outIdx===S.strikerIdx){ S.strikerIdx=nextIdx; }
   else { S.nonStrikerIdx=nextIdx; }
@@ -548,6 +559,7 @@ function pickStriker(idx){
 function pickBatsman(idx){
   // Clear retiredHurt flag when they return to play
   if(S.batting[idx]) S.batting[idx].retiredHurt=false;
+  if(S.battingOrder.indexOf(idx)<0) S.battingOrder.push(idx);
   if(S.outIdx===S.strikerIdx){ S.strikerIdx=idx; }
   else { S.nonStrikerIdx=idx; }
   S.wicketPending=false; S.outIdx=-1; render();
@@ -598,6 +610,7 @@ function resetMatch(){
   S.wicketPending=false; S.outIdx=-1;
   S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null; S.activeTab='live';
   S.snapshots=[]; S.inn1batting=[]; S.inn1bowling=[]; S.inn1fow=[]; S.inn1overHistory=[]; S.inn1overBowlers=[]; S.inn1score=null;
+  S.battingOrder=[]; S.inn1battingOrder=[];
   S.overBowlers=[];
   S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.confirmEndInnings=false;
   S.match={team1:'',team2:'',overs:20,batFirst:''};
@@ -973,8 +986,16 @@ function renderScoring(){
       '</div>';
   } else if(S.activeTab==='batting'){
     var active=[S.strikerIdx,S.nonStrikerIdx];
-    function makeBatRows(arr, activeIdxs, strikerI, nonStrikerI){
-      return arr.map(function(b,i){
+    function makeBatRows(arr, activeIdxs, strikerI, nonStrikerI, orderArr){
+      // Sort: batted players in arrival order first, then did-not-bat in original order
+      var order=orderArr||[];
+      var notBatted=[];
+      for(var ii=0;ii<arr.length;ii++){
+        if(order.indexOf(ii)<0) notBatted.push(ii);
+      }
+      var sortedIdxs=order.concat(notBatted);
+      return sortedIdxs.map(function(i){
+        var b=arr[i];
         var isStriker=(i===strikerI);
         var isNonStriker=(i===nonStrikerI);
         var isActive=activeIdxs&&activeIdxs.indexOf(i)>=0;
@@ -1010,9 +1031,9 @@ function renderScoring(){
     var bat2label=S.match.batFirst===S.match.team1?S.match.team2:S.match.team1;
     var inn1BatRows='';
     if(S.innings===2||S.phase==='result'){
-      inn1BatRows=makeBatRows(S.inn1batting,[], -1, -1);
+      inn1BatRows=makeBatRows(S.inn1batting,[], -1, -1, S.inn1battingOrder);
     }
-    var inn2BatRows=makeBatRows(S.batting, (S.innings===2?active:[]), (S.innings===2?S.strikerIdx:-1), (S.innings===2?S.nonStrikerIdx:-1));
+    var inn2BatRows=makeBatRows(S.batting, (S.innings===2?active:[]), (S.innings===2?S.strikerIdx:-1), (S.innings===2?S.nonStrikerIdx:-1), S.battingOrder);
     // Extras summary row helper
     function extrasRow(sc){
       var tot=(sc.wide||0)+(sc.nb||0)+(sc.byes||0)+(sc.legbyes||0);
