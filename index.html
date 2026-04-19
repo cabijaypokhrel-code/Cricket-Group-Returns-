@@ -341,7 +341,7 @@ function confirmDismissal(type){
     // do NOT increment wicket count or mark as out
     S.thisBalls.push('W'); // visual indicator on over
     s.balls++; w.balls++;
-    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; }
+    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
     render(); return;
   } else if(type==='retiredout'){
     var rb2=bat();
@@ -352,7 +352,7 @@ function confirmDismissal(type){
     S.wicketPending=true; S.outIdx=S.strikerIdx;
     S.thisBalls.push('W');
     s.balls++; w.balls++;
-    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; }
+    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
     render(); return;
   }
   b.out=true; b.howOut=howOut;
@@ -363,7 +363,7 @@ function confirmDismissal(type){
   S.dismissalPending=false; S.dismissalType='';
   if(s.wickets>=10){ endInnings(); return; }
   S.wicketPending=true; S.outIdx=S.strikerIdx;
-  if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; }
+  if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
   render();
 }
 
@@ -373,6 +373,8 @@ function endOver(){
   bowl().overs++;
   // DO NOT reset bowl().balls — keep accumulating so total balls = overs*6 + partial
   S.thisBalls=[]; S.thisBallsRunout=[]; swap(); S.overDone=true;
+  // End innings if all overs bowled
+  if(S.overHistory.length>=S.match.overs){ endInnings(); return; }
 }
 
 function endInnings(){
