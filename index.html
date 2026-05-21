@@ -6,46 +6,57 @@
 <title>Saturday Cricket Team </title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f0;min-height:100vh}
-.app{max-width:480px;margin:0 auto;padding:12px}
-.header{background:#0F6E56;color:#fff;border-radius:12px;padding:16px 20px;margin-bottom:12px}
-.header h1{font-size:20px;font-weight:600;margin-bottom:2px}
-.header p{font-size:13px;opacity:.8}
-.scoreboard{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:12px}
-.score-main{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
-.score-runs{font-size:52px;font-weight:600;color:#1a1a1a;line-height:1}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:linear-gradient(135deg,#0F6E56 0%,#085041 100%);min-height:100vh;color:#1a1a1a;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:#0F6E56;border-radius:3px}
+.app{max-width:520px;margin:0 auto;padding:0}
+.header{background:linear-gradient(135deg,#0F6E56 0%,#0a5043 100%);color:#fff;border-radius:0 0 24px 24px;padding:20px 16px;margin-bottom:0;box-shadow:0 8px 24px rgba(15,110,86,0.3);position:sticky;top:0;z-index:100}
+.header h1{font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px}
+.header p{font-size:14px;opacity:0.9;font-weight:500}
+#header-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5)}
+.scoreboard{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)}
+.score-main{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+.score-runs{font-size:60px;font-weight:900;color:#0F6E56;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,0.1);letter-spacing:-2px}
 .score-info{text-align:right}
-.score-overs{font-size:15px;color:#666}
-.score-rr{font-size:13px;color:#888}
-.team-names{display:flex;justify-content:space-between;margin-bottom:8px}
-.team-name{font-size:14px;font-weight:600;color:#1a1a1a}
-.target-bar{font-size:13px;color:#666;margin-bottom:12px;padding:8px;background:#f7f7f5;border-radius:8px}
-.this-over{margin-top:10px}
-.over-label{font-size:12px;color:#888;margin-bottom:6px}
-.balls-row{display:flex;gap:6px;flex-wrap:wrap}
-.ball{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;border:1px solid #ddd}
-.ball-0{background:#f0f0ee;color:#555}
-.ball-1,.ball-2,.ball-3{background:#E1F5EE;color:#0F6E56}
-.ball-4{background:#E6F1FB;color:#0C447C}
-.ball-6{background:#EEEDFE;color:#3C3489}
-.ball-W{background:#FCEBEB;color:#791F1F}
-.ball-WD,.ball-NB{background:#FAEEDA;color:#633806}
-.ball-empty{background:#f7f7f5;border:1px dashed #ccc}
-.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
-.tab{padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#666;white-space:nowrap;flex-shrink:0}
-.tab.active{background:#0F6E56;color:#fff;border-color:#0F6E56}
-.scorecard-table{width:100%;font-size:13px;border-collapse:collapse}
-.scorecard-table th{text-align:left;font-weight:600;font-size:12px;color:#888;padding:6px 8px;border-bottom:1px solid #eee}
-.scorecard-table td{padding:7px 8px;border-bottom:1px solid #eee;color:#1a1a1a}
+.score-overs{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:2px}
+.score-rr{font-size:13px;color:#777;font-weight:500}
+.team-names{display:flex;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f5f5f5}
+.team-name{font-size:15px;font-weight:700;color:#1a1a1a}
+.target-bar{font-size:13px;color:#555;margin-bottom:14px;padding:10px 12px;background:linear-gradient(135deg,#f9faf8,#f5f6f4);border-radius:10px;border:1px solid #efefef;font-weight:500}
+.this-over{margin-top:12px;background:linear-gradient(135deg,#f9faf8,#f5f6f4);padding:12px;border-radius:12px;border:1px solid #efefef}
+.over-label{font-size:11px;font-weight:800;text-transform:uppercase;color:#888;margin-bottom:8px;letter-spacing:1px}
+.balls-row{display:flex;gap:8px;flex-wrap:wrap}
+.ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #ddd;transition:all 0.2s ease;box-shadow:0 2px 4px rgba(0,0,0,0.07)}
+.ball:hover{transform:scale(1.1)}
+.ball-0{background:#f0f0ee;color:#555;border-color:#ddd}
+.ball-1,.ball-2,.ball-3{background:#E1F5EE;color:#0F6E56;border-color:#9FE1CB}
+.ball-4{background:#E6F1FB;color:#0C447C;border-color:#B5D4F4}
+.ball-6{background:#EEEDFE;color:#3C3489;border-color:#CECBF6}
+.ball-W{background:#FCEBEB;color:#791F1F;border-color:#F7C1C1}
+.ball-WD,.ball-NB{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.ball-empty{background:#fff;border:2px dashed #ddd;color:#ccc}
+.tabs{display:flex;gap:0;margin-bottom:0;overflow-x:auto;padding-bottom:0;background:#fff;border-top:1px solid #e8e8e8;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.tabs::-webkit-scrollbar{height:2px}
+.tabs::-webkit-scrollbar-thumb{background:#0F6E56;border-radius:10px}
+.tab{padding:12px 16px;border-radius:0;font-size:13px;cursor:pointer;border:none;border-bottom:3px solid transparent;background:none;color:#666;white-space:nowrap;flex-shrink:0;font-weight:600;transition:all 0.2s ease;margin-bottom:-1px}
+.tab:hover{color:#0F6E56;background:rgba(15,110,86,0.05)}
+.tab.active{background:rgba(15,110,86,0.05);color:#0F6E56;border-bottom:3px solid #0F6E56;font-weight:700}
+.scorecard-table{width:100%;font-size:13px;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:12px}
+.scorecard-table th{text-align:left;font-weight:700;font-size:12px;color:#fff;padding:10px 12px;background:linear-gradient(135deg,#0F6E56,#085041)}
+.scorecard-table td{padding:9px 12px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;font-weight:500}
 .scorecard-table td:last-child,.scorecard-table th:last-child{text-align:right}
-.card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px;margin-bottom:10px}
-.section-title{font-size:12px;font-weight:600;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.scorecard-table tr:hover{background:#f9faf8}
+.scorecard-table tr:last-child td{border-bottom:none}
+.card{background:#fff;border:1px solid #efefef;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.section-title{font-size:12px;font-weight:700;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
 .out-text{color:#aaa;font-size:11px}
 .batting-row-active{background:#E1F5EE}
-.scoring-panel{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:12px}
-.btn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.btn{padding:14px 4px;border-radius:10px;border:1px solid #ddd;cursor:pointer;font-size:16px;font-weight:600;background:#fff;color:#1a1a1a;touch-action:manipulation;transition:transform .1s}
-.btn:active{transform:scale(.93);background:#f0f0ee}
+.scoring-panel{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+.btn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.btn{padding:16px 4px;border-radius:12px;border:2px solid #ddd;cursor:pointer;font-size:16px;font-weight:700;background:#fff;color:#1a1a1a;touch-action:manipulation;transition:all 0.2s ease;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.btn:hover{box-shadow:0 3px 8px rgba(0,0,0,0.1);transform:translateY(-1px)}
+.btn:active{transform:scale(.93);box-shadow:none}
 .btn-4{background:#E6F1FB;color:#0C447C;border-color:#B5D4F4}
 .btn-6{background:#EEEDFE;color:#3C3489;border-color:#CECBF6}
 .btn-W{background:#FCEBEB;color:#791F1F;border-color:#F7C1C1}
@@ -54,54 +65,66 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-danger{background:#FCEBEB;color:#791F1F;border-color:#F7C1C1}
 .extras-row{display:flex;gap:8px;margin-bottom:10px}
 .extras-row .btn{flex:1;font-size:13px;padding:12px 4px}
-.batters-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.batter-card{border:1px solid #ddd;border-radius:10px;padding:10px;cursor:pointer;background:#fff;position:relative}
-.batter-card.striker{border-color:#0F6E56;background:#E1F5EE}
-.batter-name{font-size:13px;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:20px}
-.batter-score{font-size:12px;color:#666}
+.batters-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.batter-card{border:2px solid #e0e0e0;border-radius:14px;padding:12px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.batter-card:hover{border-color:#0F6E56;box-shadow:0 4px 12px rgba(15,110,86,0.15);transform:translateY(-2px)}
+.batter-card.striker{border-color:#0F6E56;background:linear-gradient(135deg,#E1F5EE,#f0fdf9);box-shadow:0 4px 12px rgba(15,110,86,0.2)}
+.batter-name{font-size:13px;font-weight:700;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:20px;color:#1a1a1a}
+.batter-score{font-size:12px;color:#777;font-weight:500}
 .edit-btn{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:15px;padding:2px;line-height:1}
-.setup-panel{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:12px}
-.setup-panel h3{font-size:15px;font-weight:600;margin-bottom:14px;color:#1a1a1a}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:13px;color:#666;margin-bottom:4px;font-weight:500}
-.form-group input,.form-group select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ddd;font-size:15px;background:#fff;color:#1a1a1a}
-.form-group input:focus,.form-group select:focus{outline:2px solid #0F6E56}
+.setup-panel{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);animation:fadeInSlide 0.3s ease-out}
+.setup-panel h3{font-size:16px;font-weight:700;margin-bottom:14px;color:#1a1a1a}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;color:#555;margin-bottom:6px;font-weight:600}
+.form-group input,.form-group select{width:100%;padding:12px 14px;border-radius:10px;border:2px solid #ddd;font-size:15px;background:#fff;color:#1a1a1a;transition:all 0.2s ease;font-family:inherit}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#0F6E56;box-shadow:0 0 0 4px rgba(15,110,86,0.1)}
 .player-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.player-inputs input{padding:8px 10px;border-radius:8px;border:1px solid #ddd;font-size:14px;width:100%;background:#fff;color:#1a1a1a}
-.btn-primary{width:100%;padding:14px;background:#0F6E56;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:6px}
-.btn-primary:active{background:#085041}
-.btn-secondary{width:100%;padding:12px;background:#f0f0ee;color:#1a1a1a;border:1px solid #ddd;border-radius:10px;font-size:15px;cursor:pointer;margin-top:8px}
-.modal-box{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px}
-.modal-red{border:1px solid #F7C1C1}
-.modal-blue{border:1px solid #B5D4F4}
-.modal-title-red{color:#791F1F;font-size:14px;font-weight:600;margin-bottom:12px}
-.modal-title-blue{color:#185FA5;font-size:14px;font-weight:600;margin-bottom:12px}
-.modal-title-amber{color:#633806;font-size:13px;font-weight:600;margin-bottom:8px}
-.modal-input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ddd;font-size:15px;margin-bottom:10px;background:#fff;color:#1a1a1a;display:block}
-.modal-input:focus{outline:2px solid #0F6E56}
+.player-inputs input{padding:10px 12px;border-radius:10px;border:2px solid #ddd;font-size:14px;width:100%;background:#fff;color:#1a1a1a;transition:all 0.2s ease;font-family:inherit}
+.player-inputs input:focus{outline:none;border-color:#0F6E56;box-shadow:0 0 0 3px rgba(15,110,86,0.1)}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#0F6E56,#085041);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px;transition:all 0.2s ease;box-shadow:0 4px 12px rgba(15,110,86,0.2);font-family:inherit}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,110,86,0.3)}
+.btn-primary:active{transform:translateY(0);background:linear-gradient(135deg,#085041,#063d37)}
+.btn-secondary{width:100%;padding:12px;background:#f5f5f5;color:#1a1a1a;border:1px solid #ddd;border-radius:12px;font-size:15px;cursor:pointer;margin-top:8px;transition:all 0.2s ease;font-family:inherit}
+.btn-secondary:hover{background:#efefef;border-color:#0F6E56}
+.modal-box{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);border:1px solid #f0f0f0;animation:slideUp 0.3s ease}
+.modal-red{border-top:4px solid #F7C1C1}
+.modal-blue{border-top:4px solid #B5D4F4}
+.modal-title-red{color:#791F1F;font-size:14px;font-weight:700;margin-bottom:12px}
+.modal-title-blue{color:#185FA5;font-size:14px;font-weight:700;margin-bottom:12px}
+.modal-title-amber{color:#633806;font-size:13px;font-weight:700;margin-bottom:8px}
+.modal-input{width:100%;padding:12px 14px;border-radius:10px;border:2px solid #ddd;font-size:15px;margin-bottom:10px;background:#fff;color:#1a1a1a;display:block;transition:all 0.2s ease;font-family:inherit}
+.modal-input:focus{outline:none;border-color:#0F6E56;box-shadow:0 0 0 4px rgba(15,110,86,0.1)}
 .extras-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
 .fow-table{width:100%;font-size:13px;border-collapse:collapse}
-.fow-table th{font-size:12px;color:#888;font-weight:600;padding:5px 8px;border-bottom:1px solid #eee;text-align:left}
-.fow-table td{padding:6px 8px;border-bottom:1px solid #eee}
-.info-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #eee}
+.fow-table th{font-size:12px;color:#888;font-weight:700;padding:6px 8px;border-bottom:2px solid #eee;text-align:left}
+.fow-table td{padding:7px 8px;border-bottom:1px solid #eee}
+.info-row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #f0f0f0}
 .info-row:last-child{border:none}
-.msg{background:#E1F5EE;color:#0F6E56;border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:12px;border:1px solid #9FE1CB;font-weight:600}
-.over-entry{padding:7px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
-.bowler-bar{font-size:12px;color:#666;margin-bottom:10px;padding:8px 10px;background:#f7f7f5;border-radius:8px}
+.msg{background:linear-gradient(135deg,#E1F5EE,#f0fdf9);color:#0F6E56;border-radius:10px;padding:12px 14px;font-size:14px;margin-bottom:12px;border-left:4px solid #0F6E56;font-weight:600;box-shadow:0 2px 8px rgba(15,110,86,0.1)}
+.over-entry{padding:8px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+.bowler-bar{font-size:12px;color:#666;margin-bottom:10px;padding:10px 12px;background:linear-gradient(135deg,#f9faf8,#f5f6f4);border-radius:10px;border:1px solid #efefef}
 .hint{font-size:11px;color:#aaa;margin-top:4px;text-align:center}
-.btn-cancel{width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:13px;cursor:pointer;color:#666}
-.flex-row{display:flex;gap:6px}
+.btn-cancel{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;cursor:pointer;color:#666;transition:all 0.2s ease}
+.btn-cancel:hover{background:#f5f5f5}
+.flex-row{display:flex;gap:8px}
 .flex-1{flex:1}
-.btn-undo{background:#FFF8E1;color:#7B5800;border:1px solid #FFD54F;border-radius:10px;padding:10px 4px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation;transition:transform .1s;flex:1}
+.btn-undo{background:#FFF8E1;color:#7B5800;border:1px solid #FFD54F;border-radius:10px;padding:10px 4px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;transition:all 0.2s ease;flex:1}
+.btn-undo:hover{background:#FFF3CD;box-shadow:0 3px 8px rgba(123,88,0,0.15)}
 .btn-undo:active{transform:scale(.93)}
 .btn-undo:disabled{opacity:.35;cursor:not-allowed}
-.action-row{display:flex;gap:8px;margin-bottom:10px}
-.bowler-edit-row{display:flex;align-items:center;gap:6px;margin-bottom:10px}
-.bowler-edit-row input{flex:1;padding:7px 10px;border-radius:8px;border:1px solid #ddd;font-size:14px;background:#fff;color:#1a1a1a}
-.bowler-edit-row input:focus{outline:2px solid #0F6E56}
-/* CA Bijay Pokhrel credit */
-.ca-credit{position:fixed;top:10px;right:14px;font-size:11px;font-weight:600;color:#0F6E56;opacity:.75;letter-spacing:.3px;z-index:9999;pointer-events:none;background:rgba(255,255,255,.7);padding:3px 7px;border-radius:6px;border:1px solid #c8e8df}
-/* PDF / Print styles */
+.action-row{display:flex;gap:8px;margin-bottom:12px}
+.bowler-edit-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.bowler-edit-row input{flex:1;padding:9px 12px;border-radius:10px;border:2px solid #ddd;font-size:14px;background:#fff;color:#1a1a1a;transition:all 0.2s ease;font-family:inherit}
+.bowler-edit-row input:focus{outline:none;border-color:#0F6E56;box-shadow:0 0 0 3px rgba(15,110,86,0.1)}
+.ca-credit{position:fixed;bottom:16px;right:16px;font-size:11px;font-weight:700;color:#0F6E56;opacity:0.85;letter-spacing:.3px;z-index:9999;pointer-events:none;background:rgba(255,255,255,0.95);padding:6px 12px;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,0.12)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeInSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){
+  .header{border-radius:0 0 20px 20px;padding:16px 12px}
+  .header h1{font-size:20px}
+  .btn-grid{gap:8px}
+  .dism-grid{grid-template-columns:repeat(2,1fr)}
+}
 @media print{
   body{background:#fff}
   .app{max-width:100%;padding:0}
@@ -122,27 +145,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pdf-scorecard tr:last-child td{border-bottom:none}
 .pdf-totals{font-size:13px;font-weight:600;background:#E1F5EE;color:#0F6E56;padding:8px 10px;border-radius:8px;margin-bottom:8px}
 .pdf-result{font-size:15px;font-weight:700;color:#0F6E56;background:#E1F5EE;padding:10px 14px;border-radius:8px;margin-bottom:14px;text-align:center}
-.btn-export{width:100%;padding:13px;background:#185FA5;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
-.dism-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}
-.dism-btn{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;border:1.5px solid #F7C1C1;background:#FFF5F5;cursor:pointer;touch-action:manipulation;transition:transform .1s;text-align:center}
+.btn-export{width:100%;padding:13px;background:#185FA5;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;transition:all 0.2s ease}
+.btn-export:hover{background:#1068B0;box-shadow:0 4px 12px rgba(24,95,165,0.3)}
+.btn-export:active{background:#0C3D6B}
+.dism-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.dism-btn{display:flex;flex-direction:column;align-items:center;padding:10px 6px;border-radius:12px;border:2px solid #F7C1C1;background:#FFF5F5;cursor:pointer;touch-action:manipulation;transition:all 0.2s ease;text-align:center}
+.dism-btn:hover{border-color:#791F1F;box-shadow:0 3px 8px rgba(121,31,31,0.15)}
 .dism-btn:active{transform:scale(.93)}
-.dism-btn-sel{border-color:#791F1F;background:#FCEBEB;box-shadow:0 0 0 2px #F7C1C1}
-.dism-icon{font-size:20px;line-height:1;margin-bottom:3px}
+.dism-btn-sel{border-color:#791F1F;background:#FCEBEB;box-shadow:0 0 0 3px rgba(121,31,31,0.1)}
+.dism-icon{font-size:22px;line-height:1;margin-bottom:4px}
 .dism-label{font-size:12px;font-weight:700;color:#791F1F}
-.dism-desc{font-size:10px;color:#aaa;margin-top:1px;line-height:1.2}
-.dism-detail{background:#f7f7f5;border-radius:8px;padding:10px;margin-bottom:8px}
+.dism-desc{font-size:10px;color:#aaa;margin-top:2px;line-height:1.2}
+.dism-detail{background:linear-gradient(135deg,#f9faf8,#f5f6f4);border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #efefef}
 .dism-field{margin-bottom:8px}
-.dism-field label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:3px}
-.dism-hint{font-size:11px;color:#888;background:#f0f0ee;border:1px solid #ddd;border-radius:6px;padding:6px 8px;margin-top:4px}
-.bowler-chip-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px}
-.bowler-chip{display:flex;flex-direction:column;align-items:flex-start;padding:8px 12px;border-radius:10px;cursor:pointer;border:1.5px solid #B5D4F4;background:#EFF6FD;min-width:90px;touch-action:manipulation;transition:transform .1s}
+.dism-field label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:4px}
+.dism-hint{font-size:11px;color:#888;background:#f0f0ee;border:1px solid #ddd;border-radius:8px;padding:7px 10px;margin-top:4px}
+.bowler-chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.bowler-chip{display:flex;flex-direction:column;align-items:flex-start;padding:8px 12px;border-radius:10px;cursor:pointer;border:2px solid #B5D4F4;background:#EFF6FD;min-width:90px;touch-action:manipulation;transition:all 0.2s ease}
+.bowler-chip:hover{box-shadow:0 3px 8px rgba(12,68,124,0.15);transform:translateY(-1px)}
 .bowler-chip:active{transform:scale(.93)}
 .bowler-chip-used{border-color:#B5D4F4;background:#EFF6FD}
 .bowler-chip-fresh{border-color:#9FE1CB;background:#E1F5EE}
-.chip-name{font-size:13px;font-weight:600;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.chip-name{font-size:13px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
 .chip-stat{font-size:11px;color:#888;margin-top:1px}
 .chip-label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.btn-export:active{background:#0C3D6B}
+#main-content{padding:16px;background:#f8faf7;min-height:calc(100vh - 120px)}
 </style>
 </head>
 <body>
@@ -219,6 +246,7 @@ function rr(s){ return s.balls===0?'0.00':(s.runs/(s.balls/6)).toFixed(2); }
 function target(){ return S.innings===2 ? S.t1.runs+1 : null; }
 function ballClass(b){
   if(b==='W') return 'W';
+  if(b.length>1 && b.endsWith('W')) return 'W'; // run-out with runs e.g. '1W','2W'
   if(b.indexOf('WD')===0) return 'WD';
   if(b.indexOf('NB')===0) return 'NB';
   if(b.indexOf('LB')===0) return 'WD';
@@ -324,8 +352,28 @@ function confirmDismissal(type){
     var f1=document.getElementById('inp-f1')?document.getElementById('inp-f1').value.trim():'';
     var f2=document.getElementById('inp-f2')?document.getElementById('inp-f2').value.trim():'';
     if(!f1){ alert('Enter at least one fielder name'); return; }
-    howOut='run out ('+(f2?f1+'/'+f2:f1)+')';
-    S.thisBallsRunout.push(S.thisBalls.length); // mark next W as run-out (no bowler credit)
+    var roRuns=parseInt((document.getElementById('inp-ro-runs')||{}).value)||0;
+    var roWho=((document.getElementById('inp-ro-who')||{}).value)||'striker';
+    var roOutIdx=(roWho==='nonstriker')?S.nonStrikerIdx:S.strikerIdx;
+    var roOb=S.batting[roOutIdx];
+    var roHowOut='run out ('+(f2?f1+'/'+f2:f1)+')';
+    if(roRuns>0){
+      s.runs+=roRuns; w.runs+=roRuns;
+      bat().runs+=roRuns;
+      if(roRuns===4) bat().fours++;
+    }
+    var roBallEntry=roRuns>0?(roRuns+'W'):'W';
+    S.thisBallsRunout.push(S.thisBalls.length);
+    roOb.out=true; roOb.howOut=roHowOut;
+    s.wickets++;
+    S.fow.push({score:s.runs,wkts:s.wickets,name:roOb.name,over:overs(s)});
+    S.thisBalls.push(roBallEntry);
+    s.balls++; w.balls++;
+    S.dismissalPending=false; S.dismissalType='';
+    if(s.wickets>=10){ endInnings(); return; }
+    S.wicketPending=true; S.outIdx=roOutIdx;
+    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
+    render(); return;
   } else if(type==='hitwicket'){
     howOut='hit wicket b '+w.name;
     w.wickets++;
@@ -333,15 +381,11 @@ function confirmDismissal(type){
     howOut='obstructing the field';
     S.thisBallsRunout.push(S.thisBalls.length); // no bowler credit
   } else if(type==='retiredhurt'){
-    // Retired hurt: NOT out, can come back
+    // Retired hurt: NOT out, can come back. No ball is consumed.
     var rb=bat();
     rb.retiredHurt=true;
     S.dismissalPending=false; S.dismissalType='';
     S.wicketPending=true; S.outIdx=S.strikerIdx;
-    // do NOT increment wicket count or mark as out
-    S.thisBalls.push('W'); // visual indicator on over
-    s.balls++; w.balls++;
-    if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
     render(); return;
   } else if(type==='retiredout'){
     var rb2=bat();
@@ -748,11 +792,26 @@ function renderScoring(){
   var targetBar='';
   if(tgt){
     if(s.runs>=tgt){
-      // Batting team has won
       var wicketsLeft=10-s.wickets;
       targetBar='<div class="target-bar" style="background:#E1F5EE;color:#0F6E56;font-weight:700;font-size:14px;border:1px solid #9FE1CB">&#127942; '+battingTeam+' won by '+wicketsLeft+' wicket'+(wicketsLeft===1?'':'s')+'!</div>';
     } else {
-      targetBar='<div class="target-bar">&#127919; Need '+reqR+' off '+reqB+' balls | Req RR: '+reqRR+'</div>';
+      var chasePct=Math.min(100,Math.round((s.runs/tgt)*100));
+      var curRRnum=parseFloat(rr(s)), reqRRnum=parseFloat(reqRR);
+      var meterColor=reqRRnum>curRRnum+3?'#791F1F':reqRRnum>curRRnum?'#633806':'#0F6E56';
+      targetBar=
+        '<div class="target-bar" style="padding:10px 12px">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+            '<span style="font-size:13px;font-weight:700">&#127919; Need '+reqR+' off '+reqB+'b</span>'+
+            '<span style="font-size:12px;font-weight:700;color:'+meterColor+'">Req RR: '+reqRR+'</span>'+
+          '</div>'+
+          '<div style="background:rgba(0,0,0,0.12);border-radius:8px;height:8px;overflow:hidden">'+
+            '<div style="background:linear-gradient(90deg,'+meterColor+','+meterColor+'cc);width:'+chasePct+'%;height:100%;border-radius:8px;transition:width 0.4s ease"></div>'+
+          '</div>'+
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.75);margin-top:4px">'+
+            '<span>'+s.runs+' scored</span>'+
+            '<span>Target: '+tgt+'</span>'+
+          '</div>'+
+        '</div>';
     }
   }
 
@@ -830,9 +889,25 @@ function renderScoring(){
           '<div class="dism-hint">Bowler credit: '+wname+'</div>'+
         '</div>';
     } else if(dt==='runout'){
+      var roSname=bat().name, roNsname=ns().name;
       detailHtml=
         '<div class="dism-detail">'+
-          '<div class="dism-field"><label>Fielder 1</label>'+
+          '<div class="dism-field"><label>Who is out?</label>'+
+            '<div style="display:flex;gap:8px;margin-bottom:6px">'+
+              '<button type="button" id="ro-striker-btn" onclick="document.getElementById(\'inp-ro-who\').value=\'striker\';document.getElementById(\'ro-striker-btn\').style.background=\'#FCEBEB\';document.getElementById(\'ro-striker-btn\').style.borderColor=\'#791F1F\';document.getElementById(\'ro-ns-btn\').style.background=\'#fff\';document.getElementById(\'ro-ns-btn\').style.borderColor=\'#ddd\';document.getElementById(\'ro-ns-btn\').style.color=\'#1a1a1a\'" style="flex:1;padding:10px;border-radius:10px;border:2px solid #791F1F;background:#FCEBEB;cursor:pointer;font-size:13px;font-weight:700;color:#791F1F">&#11088; '+roSname+'<br><span style="font-size:11px;font-weight:400">Striker</span></button>'+
+              '<button type="button" id="ro-ns-btn" onclick="document.getElementById(\'inp-ro-who\').value=\'nonstriker\';document.getElementById(\'ro-ns-btn\').style.background=\'#FCEBEB\';document.getElementById(\'ro-ns-btn\').style.borderColor=\'#791F1F\';document.getElementById(\'ro-ns-btn\').style.color=\'#791F1F\';document.getElementById(\'ro-striker-btn\').style.background=\'#fff\';document.getElementById(\'ro-striker-btn\').style.borderColor=\'#ddd\';document.getElementById(\'ro-striker-btn\').style.color=\'#1a1a1a\'" style="flex:1;padding:10px;border-radius:10px;border:2px solid #ddd;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:#1a1a1a">'+roNsname+'<br><span style="font-size:11px;font-weight:400">Non-Striker</span></button>'+
+            '</div>'+
+            '<input type="hidden" id="inp-ro-who" value="striker">'+
+          '</div>'+
+          '<div class="dism-field" style="margin-top:8px"><label>Runs scored</label>'+
+            '<div style="display:flex;gap:6px;margin-bottom:6px" id="ro-runs-row">'+
+              [0,1,2,3,4].map(function(r){
+                return '<button type="button" onclick="document.getElementById(\'inp-ro-runs\').value=\''+r+'\';Array.from(document.getElementById(\'ro-runs-row\').querySelectorAll(\'button\')).forEach(function(b){b.style.background=\'#fff\';b.style.borderColor=\'#ddd\'});this.style.background=\'#E1F5EE\';this.style.borderColor=\'#0F6E56\'" style="flex:1;padding:10px;border-radius:10px;border:2px solid '+(r===0?'#0F6E56':'#ddd')+';background:'+(r===0?'#E1F5EE':'#fff')+';cursor:pointer;font-size:16px;font-weight:700">'+r+'</button>';
+              }).join('')+
+            '</div>'+
+            '<input type="hidden" id="inp-ro-runs" value="0">'+
+          '</div>'+
+          '<div class="dism-field" style="margin-top:8px"><label>Fielder 1</label>'+
             fielderChipRow('inp-f1')+
             '<input id="inp-f1" class="modal-input" placeholder="Or type primary fielder" style="margin:0">'+
           '</div>'+
@@ -866,7 +941,7 @@ function renderScoring(){
       '</div>';
   } else if(S.wicketPending){
     // Only block the non-striker slot from being picked; the striker slot is the one that just got out
-    var activeSlots=[S.nonStrikerIdx];
+    var activeSlots=[S.outIdx===S.strikerIdx?S.nonStrikerIdx:S.strikerIdx];
     var retiredHurt=[], notYet=[];
     S.batting.forEach(function(b,i){
       if(b.out) return;                        // already dismissed — skip
@@ -988,6 +1063,19 @@ function renderScoring(){
             '<div class="batter-score">'+ns().runs+' ('+ns().balls+'b) '+ns().fours+'&times;4 '+ns().sixes+'&times;6</div>'+
           '</div>'+
         '</div>'+
+        (function(){
+          var lastFow=S.fow.length>0?S.fow[S.fow.length-1]:null;
+          var partRuns=s.runs-(lastFow?lastFow.score:0);
+          var lastFowParts=(lastFow?lastFow.over:'0.0').split('.');
+          var lastFowBalls=parseInt(lastFowParts[0])*6+parseInt(lastFowParts[1]||0);
+          var partBalls=s.balls-lastFowBalls-(lastFow?1:0);
+          var pRR=partBalls>0?(partRuns/(partBalls/6)).toFixed(2):'0.00';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;background:#F0FDF9;border:1px solid #9FE1CB;border-radius:10px;padding:8px 12px;margin-bottom:10px">'+
+            '<span style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px">&#129309; Partnership</span>'+
+            '<span style="font-size:16px;font-weight:800;color:#0F6E56">'+partRuns+' runs</span>'+
+            '<span style="font-size:11px;color:#888">'+partBalls+' balls &bull; RR '+pRR+'</span>'+
+          '</div>';
+        })()+
         (S.editBowler?
           '<div style="background:#EFF6FD;border:1px solid #B5D4F4;border-radius:10px;padding:10px;margin-bottom:10px">'+
             '<div style="font-size:11px;color:#185FA5;font-weight:600;margin-bottom:8px">&#9999; Select or rename bowler</div>'+
@@ -1033,6 +1121,23 @@ function renderScoring(){
         '<button class="btn" style="flex:1;font-size:12px;padding:10px 2px" data-action="save-progress">&#128190; Save</button>'+
         '<button class="btn btn-danger" style="flex:1;font-size:12px;padding:10px 2px" data-action="end-innings">End Inn.</button>'+
         '</div>'+
+        (function(){
+          var dotCnt=0,fourCnt=0,sixCnt=0,extraCnt=0,runsCnt=0;
+          S.thisBalls.forEach(function(b){
+            if(b==='0') dotCnt++;
+            else if(b==='4'){ fourCnt++; runsCnt+=4; }
+            else if(b==='6'){ sixCnt++; runsCnt+=6; }
+            else if(b.indexOf('WD')===0||b.indexOf('NB')===0) extraCnt++;
+            else if(!isNaN(parseInt(b))&&b.indexOf('W')<0) runsCnt+=parseInt(b);
+          });
+          if(S.thisBalls.length===0) return '';
+          return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#f8faf7;border:1px solid #e8ede8;border-radius:10px;padding:8px;margin-bottom:6px;text-align:center">'+
+            '<div><div style="font-size:16px;font-weight:800;color:#aaa">'+dotCnt+'</div><div style="font-size:10px;color:#bbb;margin-top:1px">Dots</div></div>'+
+            '<div><div style="font-size:16px;font-weight:800;color:#0F6E56">'+fourCnt+'</div><div style="font-size:10px;color:#bbb;margin-top:1px">Fours</div></div>'+
+            '<div><div style="font-size:16px;font-weight:800;color:#185FA5">'+sixCnt+'</div><div style="font-size:10px;color:#bbb;margin-top:1px">Sixes</div></div>'+
+            '<div><div style="font-size:16px;font-weight:800;color:#633806">'+extraCnt+'</div><div style="font-size:10px;color:#bbb;margin-top:1px">Extras</div></div>'+
+          '</div>';
+        })()+
         '<div class="hint">Tap batter cards to swap strike</div>'+
       '</div>';
   }
@@ -1261,69 +1366,262 @@ function renderInn1Complete(){
   var bat1=S.match.batFirst;
   var bat2=bat1===S.match.team1?S.match.team2:S.match.team1;
   var s1=S.inn1score||S.t1;
+
+  // Top scorer and top wicket-taker chips
   var topScorer='', topWkts='';
-  // Find top scorer
   var maxR=0;
   S.inn1batting.forEach(function(b){ if(b.runs>maxR){ maxR=b.runs; topScorer=b.name+' '+b.runs+'('+b.balls+'b)'; } });
-  // Find top bowler
   var maxW=0;
-  S.inn1bowling.forEach(function(b){ if(b.wickets>maxW||(b.wickets===maxW&&b.wickets>0&&b.runs<parseInt(topWkts.split('/')[0]||999))){ maxW=b.wickets; topWkts=b.runs+'/'+b.wickets+' — '+b.name; } });
+  S.inn1bowling.forEach(function(b){ if(b.wickets>maxW||(b.wickets===maxW&&b.wickets>0)){ maxW=b.wickets; topWkts=b.wickets+'/'+b.runs+' — '+b.name; } });
+
+  // Batting rows
+  var order=S.inn1battingOrder.length?S.inn1battingOrder:[];
+  var notBatted=[];
+  for(var ii=0;ii<S.inn1batting.length;ii++){ if(order.indexOf(ii)<0) notBatted.push(ii); }
+  var batHtml=order.concat(notBatted).map(function(i){
+    var b=S.inn1batting[i];
+    var status, sc;
+    if(b.out){ status=b.howOut; sc='color:#791F1F'; }
+    else if(b.retiredHurt){ status='retired hurt'; sc='color:#aaa'; }
+    else if(b.balls>0){ status='not out'; sc='color:#0F6E56;font-weight:600'; }
+    else { status='did not bat'; sc='color:#aaa;font-style:italic'; }
+    var sr=b.balls>0?((b.runs/b.balls)*100).toFixed(0):'-';
+    return '<tr>'+
+      '<td style="max-width:110px"><span style="font-weight:600">'+b.name+'</span><br>'+
+        '<span style="font-size:10px;'+sc+'">'+status+'</span></td>'+
+      '<td><b>'+(b.balls>0?b.runs:'-')+'</b></td>'+
+      '<td>'+(b.balls>0?b.balls:'-')+'</td>'+
+      '<td>'+(b.balls>0?b.fours:'-')+'</td>'+
+      '<td>'+(b.balls>0?b.sixes:'-')+'</td>'+
+      '<td>'+sr+'</td></tr>';
+  }).join('');
+
+  // Extras + totals
+  var extW=s1.wide||0, extNB=s1.nb||0, extB=s1.byes||0, extLB=s1.legbyes||0;
+  var extTot=extW+extNB+extB+extLB;
+  var extrasHtml='<tr style="background:#FAEEDA">'+
+    '<td style="font-weight:600;color:#633806">Extras</td>'+
+    '<td style="font-weight:700;color:#633806">'+extTot+'</td>'+
+    '<td colspan="4" style="font-size:10px;color:#888">WD:'+extW+' NB:'+extNB+(extB?' B:'+extB:'')+(extLB?' LB:'+extLB:'')+'</td></tr>';
+  var totalHtml='<tr style="background:#E1F5EE">'+
+    '<td style="font-weight:700">Total</td>'+
+    '<td style="font-weight:700;color:#0F6E56">'+s1.runs+'</td>'+
+    '<td colspan="4" style="font-size:10px;color:#555;font-weight:600">'+s1.wickets+' wkts &nbsp;|&nbsp; '+overs(s1)+' ov &nbsp;|&nbsp; RR '+rr(s1)+'</td></tr>';
+
+  // Bowling rows
+  var bowlHtml=S.inn1bowling.filter(function(b){return b.balls>0;}).map(function(b){
+    var ovStr=Math.floor(b.balls/6)+'.'+(b.balls%6);
+    var econ=b.balls>0?(b.runs/(b.balls/6)).toFixed(2):'-';
+    return '<tr><td style="font-weight:600">'+b.name+'</td>'+
+      '<td>'+ovStr+'</td><td>'+b.runs+'</td>'+
+      '<td><b style="color:'+(b.wickets>0?'#791F1F':'#1a1a1a')+'">'+b.wickets+'</b></td>'+
+      '<td>'+econ+'</td></tr>';
+  }).join('');
+
+  // Fall of wickets
+  var fowHtml=S.inn1fow.map(function(f,i){
+    return '<tr><td style="color:#aaa;font-size:11px">'+(i+1)+'</td>'+
+      '<td style="font-weight:600">'+f.score+'/'+f.wkts+'</td>'+
+      '<td>'+f.name+'</td><td style="color:#aaa;font-size:11px">'+f.over+'</td></tr>';
+  }).join('');
+
   document.getElementById('main-content').innerHTML=
-    '<div class="scoreboard" style="text-align:center">'+
-      '<div style="font-size:13px;color:#888;margin-bottom:6px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">1st Innings Complete</div>'+
-      '<div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px">'+bat1+'</div>'+
-      '<div style="font-size:52px;font-weight:700;color:#0F6E56;line-height:1;margin-bottom:4px">'+s1.runs+'/'+s1.wickets+'</div>'+
-      '<div style="font-size:14px;color:#666;margin-bottom:12px">'+overs(s1)+' overs &nbsp;|&nbsp; RR: '+rr(s1)+'</div>'+
-      (topScorer?'<div style="font-size:13px;background:#E1F5EE;color:#0F6E56;border-radius:8px;padding:6px 12px;margin-bottom:6px;display:inline-block">&#127956; '+topScorer+'</div><br>':'')+
-      (topWkts?'<div style="font-size:13px;background:#FCEBEB;color:#791F1F;border-radius:8px;padding:6px 12px;margin-bottom:16px;display:inline-block">&#127955; '+topWkts+'</div>':'')+
+    // ── Score header ──
+    '<div class="scoreboard" style="text-align:center;padding-bottom:14px">'+
+      '<div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">&#9989; 1st Innings Complete</div>'+
+      '<div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:6px">'+bat1+'</div>'+
+      '<div style="font-size:58px;font-weight:900;color:#0F6E56;line-height:1;letter-spacing:-2px;margin-bottom:6px">'+s1.runs+'/'+s1.wickets+'</div>'+
+      '<div style="font-size:14px;color:#666;margin-bottom:12px">'+overs(s1)+' overs &nbsp;|&nbsp; RR: <b>'+rr(s1)+'</b></div>'+
+      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+        (topScorer?'<span style="font-size:12px;background:#E1F5EE;color:#0F6E56;border-radius:20px;padding:5px 12px;font-weight:600">&#127956; '+topScorer+'</span>':'')+
+        (topWkts?'<span style="font-size:12px;background:#FCEBEB;color:#791F1F;border-radius:20px;padding:5px 12px;font-weight:600">&#127955; '+topWkts+'</span>':'')+
+      '</div>'+
     '</div>'+
-    '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:12px;text-align:center">'+
-      '<div style="font-size:13px;color:#888;margin-bottom:8px">'+bat2+' need <strong style="color:#1a1a1a;font-size:16px">'+(s1.runs+1)+'</strong> runs to win in '+S.match.overs+' overs</div>'+
-      '<div style="font-size:12px;color:#888">Required Run Rate: <strong style="color:#185FA5">'+((s1.runs+1)/(S.match.overs)).toFixed(2)+'</strong> per over</div>'+
+
+    // ── Batting scorecard ──
+    '<div class="card">'+
+      '<div class="section-title">'+bat1+' &mdash; Batting</div>'+
+      '<table class="scorecard-table">'+
+        '<tr><th style="min-width:90px">Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+
+        batHtml+extrasHtml+totalHtml+
+      '</table>'+
     '</div>'+
-    '<button class="btn-primary" data-action="start-inn2" style="margin-bottom:10px">&#127951; Start 2nd Innings — '+bat2+' batting</button>';
+
+    // ── Bowling figures ──
+    '<div class="card">'+
+      '<div class="section-title">'+bat2+' &mdash; Bowling</div>'+
+      '<table class="scorecard-table">'+
+        '<tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>'+
+        bowlHtml+
+      '</table>'+
+    '</div>'+
+
+    // ── Fall of wickets ──
+    (fowHtml?
+      '<div class="card">'+
+        '<div class="section-title">Fall of Wickets</div>'+
+        '<table class="scorecard-table">'+
+          '<tr><th>#</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+
+          fowHtml+
+        '</table>'+
+      '</div>':'')+
+
+    // ── Target card ──
+    '<div class="card" style="text-align:center;padding:20px 16px">'+
+      '<div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+bat2+' need</div>'+
+      '<div style="font-size:48px;font-weight:900;color:#185FA5;line-height:1;letter-spacing:-1px">'+(s1.runs+1)+'</div>'+
+      '<div style="font-size:13px;color:#555;margin-top:6px">runs to win &nbsp;|&nbsp; '+S.match.overs+' overs</div>'+
+      '<div style="font-size:12px;color:#888;margin-top:4px">Required RR: <b style="color:#185FA5">'+((s1.runs+1)/S.match.overs).toFixed(2)+'</b></div>'+
+    '</div>'+
+
+    '<button class="btn-primary" data-action="start-inn2" style="margin-bottom:12px">&#127951; Start 2nd Innings &mdash; '+bat2+' batting</button>';
 }
 
 function renderResult(){
   saveMatchToHistory();
   var s1=S.inn1score||S.t1, s2=S.t2;
   var bat1=S.match.batFirst, bat2=bat1===S.match.team1?S.match.team2:S.match.team1;
-  var margin='', winner='', resultIcon='&#129309;';
+  var winner='', margin='', resultIcon='&#129309;';
   if(s1.runs>s2.runs){ winner=bat1; margin='won by '+(s1.runs-s2.runs)+' run'+(s1.runs-s2.runs!==1?'s':''); resultIcon='&#127942;'; }
   else if(s2.runs>s1.runs){ winner=bat2; margin='won by '+(10-s2.wickets)+' wicket'+(10-s2.wickets!==1?'s':''); resultIcon='&#127942;'; }
-  else { winner=''; margin='Match tied'; }
+  else { margin='Match tied'; }
   var resultText=winner?winner+' '+margin:margin;
 
-  // Top scorers / bowlers summary
-  var inn1Top='', inn2Top='', inn1Bowl='', inn2Bowl='';
-  var maxR=0; S.inn1batting.forEach(function(b){ if(b.runs>maxR){maxR=b.runs;inn1Top=b.name+' '+b.runs+'('+b.balls+'b)';} });
-  maxR=0; S.batting.forEach(function(b){ if(b.runs>maxR){maxR=b.runs;inn2Top=b.name+' '+b.runs+'('+b.balls+'b)';} });
-  var maxW=0; S.inn1bowling.forEach(function(b){ if(b.wickets>maxW){maxW=b.wickets;inn1Bowl=b.name+' '+b.wickets+'/'+(b.runs);} });
-  maxW=0; S.bowling.forEach(function(b){ if(b.wickets>maxW){maxW=b.wickets;inn2Bowl=b.name+' '+b.wickets+'/'+(b.runs);} });
+  var b1=S.inn1batting.length?S.inn1batting:S.batting;
+  var bw1=S.inn1bowling.length?S.inn1bowling:S.bowling;
+  var fow1=S.inn1fow.length?S.inn1fow:S.fow;
+  var ord1=S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder;
+  var b2=S.batting, bw2=S.bowling, fow2=S.fow, ord2=S.battingOrder;
+
+  function makeBat(arr, orderArr, sc){
+    var order=orderArr||[];
+    var notBatted=[];
+    for(var ii=0;ii<arr.length;ii++){ if(order.indexOf(ii)<0) notBatted.push(ii); }
+    var rows=order.concat(notBatted).map(function(i){
+      var b=arr[i], status, scolor;
+      if(b.out){ status=b.howOut; scolor='#791F1F'; }
+      else if(b.retiredHurt){ status='retired hurt'; scolor='#aaa'; }
+      else if(b.balls>0){ status='not out'; scolor='#0F6E56'; }
+      else { status='did not bat'; scolor='#aaa'; }
+      var sr=b.balls>0?((b.runs/b.balls)*100).toFixed(0):'-';
+      return '<tr>'+
+        '<td style="font-weight:600">'+b.name+'<br><span style="font-size:10px;color:'+scolor+'">'+status+'</span></td>'+
+        '<td><b>'+(b.balls>0?b.runs:'-')+'</b></td>'+
+        '<td>'+(b.balls>0?b.balls:'-')+'</td>'+
+        '<td>'+(b.balls>0?b.fours:'-')+'</td>'+
+        '<td>'+(b.balls>0?b.sixes:'-')+'</td>'+
+        '<td>'+(b.balls>0?sr:'-')+'</td></tr>';
+    }).join('');
+    var extW=sc.wide||0, extNB=sc.nb||0, extB=sc.byes||0, extLB=sc.legbyes||0;
+    var extTot=extW+extNB+extB+extLB;
+    return '<table class="scorecard-table">'+
+      '<tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+
+      rows+
+      '<tr style="background:#FAEEDA"><td style="font-weight:600;color:#633806">Extras</td>'+
+        '<td style="font-weight:700;color:#633806">'+extTot+'</td>'+
+        '<td colspan="4" style="font-size:10px;color:#888">WD:'+extW+' NB:'+extNB+(extB?' B:'+extB:'')+(extLB?' LB:'+extLB:'')+'</td></tr>'+
+      '<tr style="background:#E1F5EE"><td style="font-weight:700">Total</td>'+
+        '<td style="font-weight:700;color:#0F6E56">'+sc.runs+'</td>'+
+        '<td colspan="4" style="font-size:10px;color:#555;font-weight:600">'+sc.wickets+' wkts &nbsp;|&nbsp; '+overs(sc)+' ov &nbsp;|&nbsp; RR '+rr(sc)+'</td></tr>'+
+    '</table>';
+  }
+
+  function makeBowl(arr){
+    return '<table class="scorecard-table">'+
+      '<tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>'+
+      arr.filter(function(b){return b.balls>0;}).map(function(b){
+        var ovStr=Math.floor(b.balls/6)+'.'+(b.balls%6);
+        return '<tr><td style="font-weight:600">'+b.name+'</td><td>'+ovStr+'</td><td>'+b.runs+'</td>'+
+          '<td><b style="color:'+(b.wickets>0?'#791F1F':'#1a1a1a')+'">'+b.wickets+'</b></td>'+
+          '<td>'+(b.balls>0?(b.runs/(b.balls/6)).toFixed(2):'-')+'</td></tr>';
+      }).join('')+
+    '</table>';
+  }
+
+  function makeFow(arr){
+    if(!arr.length) return '';
+    return '<table class="scorecard-table">'+
+      '<tr><th>#</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+
+      arr.map(function(f,i){
+        return '<tr><td style="color:#aaa;font-size:11px">'+(i+1)+'</td>'+
+          '<td style="font-weight:600">'+f.score+'/'+f.wkts+'</td>'+
+          '<td>'+f.name+'</td><td style="color:#aaa;font-size:11px">'+f.over+'</td></tr>';
+      }).join('')+
+    '</table>';
+  }
+
+  // ── Player of the Match ──
+  var potmAllBat=[];
+  b1.forEach(function(b){ potmAllBat.push({name:b.name,runs:b.runs,balls:b.balls,team:bat1}); });
+  b2.forEach(function(b){ potmAllBat.push({name:b.name,runs:b.runs,balls:b.balls,team:bat2}); });
+  potmAllBat.sort(function(a,b){ return b.runs-a.runs; });
+  var potmTopBat=potmAllBat[0]||{name:'',runs:0,balls:0,team:''};
+
+  var potmAllBowl=[];
+  bw1.filter(function(b){return b.balls>0;}).forEach(function(b){ potmAllBowl.push({name:b.name,wickets:b.wickets,runs:b.runs,balls:b.balls,team:bat2}); });
+  bw2.filter(function(b){return b.balls>0;}).forEach(function(b){ potmAllBowl.push({name:b.name,wickets:b.wickets,runs:b.runs,balls:b.balls,team:bat1}); });
+  potmAllBowl.sort(function(a,b){ return b.wickets-a.wickets||(a.runs-b.runs); });
+  var potmTopBowl=potmAllBowl[0]||{name:'',wickets:0,runs:0,balls:0,team:''};
+
+  var potm, potmStat, potmReason;
+  if(potmTopBowl.wickets>=3 && potmTopBat.runs<25){
+    potm=potmTopBowl.name; potmStat=potmTopBowl.wickets+'W / '+potmTopBowl.runs+'R in '+Math.floor(potmTopBowl.balls/6)+'.'+potmTopBowl.balls%6+' ov';
+    potmReason='Best Bowling'; potmTeam=potmTopBowl.team;
+  } else {
+    potm=potmTopBat.name; potmStat=potmTopBat.runs+' runs ('+potmTopBat.balls+' balls)';
+    potmReason='Top Scorer'; potmTeam=potmTopBat.team;
+  }
+  var potmHtml='<div style="background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border:2px solid #FFD54F;border-radius:16px;padding:16px 14px;margin-bottom:12px;text-align:center;box-shadow:0 2px 12px rgba(255,213,79,0.3)">'+
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7B5800;margin-bottom:6px">&#127942; Player of the Match</div>'+
+    '<div style="font-size:22px;font-weight:900;color:#1a1a1a;margin-bottom:2px">'+potm+'</div>'+
+    '<div style="font-size:13px;font-weight:600;color:#633806;margin-bottom:2px">'+potmStat+'</div>'+
+    '<div style="font-size:11px;color:#aaa">'+potmReason+' &mdash; '+potmTeam+'</div>'+
+  '</div>';
 
   document.getElementById('main-content').innerHTML=
-    '<div class="scoreboard">'+
-      '<div class="msg" style="font-size:16px;text-align:center">'+resultIcon+' '+resultText+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
-        '<div style="background:#f7f7f5;border-radius:10px;padding:12px;text-align:center">'+
-          '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">'+bat1+' — Inn. 1</div>'+
-          '<div style="font-size:28px;font-weight:700;color:#0F6E56">'+s1.runs+'/'+s1.wickets+'</div>'+
-          '<div style="font-size:12px;color:#aaa">'+overs(s1)+' ov | RR '+rr(s1)+'</div>'+
-          (inn1Top?'<div style="font-size:11px;color:#0F6E56;margin-top:4px">&#127956; '+inn1Top+'</div>':'')+
-          (inn1Bowl?'<div style="font-size:11px;color:#791F1F;margin-top:2px">&#127955; '+inn1Bowl+'</div>':'')+
+    potmHtml+
+    // ── Result banner ──
+    '<div class="scoreboard" style="text-align:center;padding-bottom:16px">'+
+      '<div style="font-size:26px;margin-bottom:8px">'+resultIcon+'</div>'+
+      '<div style="font-size:19px;font-weight:800;color:#1a1a1a;margin-bottom:4px">'+resultText+'</div>'+
+      '<div style="font-size:12px;color:#888;margin-bottom:16px">'+S.match.team1+' vs '+S.match.team2+' &nbsp;&bull;&nbsp; '+S.match.overs+' overs</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+        '<div style="background:#f5f5f5;border-radius:12px;padding:12px">'+
+          '<div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+bat1+' &mdash; Inn 1</div>'+
+          '<div style="font-size:30px;font-weight:900;color:#0F6E56;letter-spacing:-1px">'+s1.runs+'/'+s1.wickets+'</div>'+
+          '<div style="font-size:11px;color:#aaa">'+overs(s1)+' ov &nbsp;|&nbsp; RR '+rr(s1)+'</div>'+
         '</div>'+
-        '<div style="background:#f7f7f5;border-radius:10px;padding:12px;text-align:center">'+
-          '<div style="font-size:12px;font-weight:600;color:#888;margin-bottom:4px">'+bat2+' — Inn. 2</div>'+
-          '<div style="font-size:28px;font-weight:700;color:#0F6E56">'+s2.runs+'/'+s2.wickets+'</div>'+
-          '<div style="font-size:12px;color:#aaa">'+overs(s2)+' ov | RR '+rr(s2)+'</div>'+
-          (inn2Top?'<div style="font-size:11px;color:#0F6E56;margin-top:4px">&#127956; '+inn2Top+'</div>':'')+
-          (inn2Bowl?'<div style="font-size:11px;color:#791F1F;margin-top:2px">&#127955; '+inn2Bowl+'</div>':'')+
+        '<div style="background:#f5f5f5;border-radius:12px;padding:12px">'+
+          '<div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+bat2+' &mdash; Inn 2</div>'+
+          '<div style="font-size:30px;font-weight:900;color:#0F6E56;letter-spacing:-1px">'+s2.runs+'/'+s2.wickets+'</div>'+
+          '<div style="font-size:11px;color:#aaa">'+overs(s2)+' ov &nbsp;|&nbsp; RR '+rr(s2)+'</div>'+
         '</div>'+
       '</div>'+
     '</div>'+
-    '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:14px;margin-bottom:12px;font-size:13px;color:#666;text-align:center">'+
-      'Would you like to export the full match report?'+
+
+    // ── 1st Innings ──
+    '<div class="card">'+
+      '<div class="section-title">'+bat1+' &mdash; 1st Innings Batting</div>'+
+      makeBat(b1,ord1,s1)+
     '</div>'+
+    '<div class="card">'+
+      '<div class="section-title">'+bat2+' &mdash; Bowling (Inn. 1)</div>'+
+      makeBowl(bw1)+
+    '</div>'+
+    (makeFow(fow1)?'<div class="card"><div class="section-title">Fall of Wickets &mdash; '+bat1+'</div>'+makeFow(fow1)+'</div>':'')+
+
+    // ── 2nd Innings ──
+    '<div class="card">'+
+      '<div class="section-title">'+bat2+' &mdash; 2nd Innings Batting</div>'+
+      makeBat(b2,ord2,s2)+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="section-title">'+bat1+' &mdash; Bowling (Inn. 2)</div>'+
+      makeBowl(bw2)+
+    '</div>'+
+    (makeFow(fow2)?'<div class="card"><div class="section-title">Fall of Wickets &mdash; '+bat2+'</div>'+makeFow(fow2)+'</div>':'')+
+
+    // ── Actions ──
     '<button class="btn-export" data-action="export-pdf" style="margin-bottom:8px">&#128438; Export Match Report (PDF)</button>'+
     '<button class="btn-secondary" data-action="new-match">&#128260; New Match</button>';
 }
