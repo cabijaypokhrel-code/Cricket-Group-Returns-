@@ -7,14 +7,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:linear-gradient(135deg,#0F6E56 0%,#085041 100%);min-height:100vh;color:#1a1a1a;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#f2f4f6;min-height:100vh;color:#1a1a1a;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:#0F6E56;border-radius:3px}
 .app{max-width:520px;margin:0 auto;padding:0}
-.header{background:linear-gradient(135deg,#0F6E56 0%,#0a5043 100%);color:#fff;border-radius:0 0 24px 24px;padding:20px 16px;margin-bottom:0;box-shadow:0 8px 24px rgba(15,110,86,0.3);position:sticky;top:0;z-index:100}
-.header h1{font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px}
-.header p{font-size:14px;opacity:0.9;font-weight:500}
-#header-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5)}
+.header{background:#fff;color:#1a1a1a;border-radius:0;padding:14px 16px;margin-bottom:0;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:sticky;top:0;z-index:100;border-bottom:3px solid #0F6E56}
+.header h1{font-size:20px;font-weight:800;margin-bottom:2px;letter-spacing:-0.5px;color:#1a1a1a}
+.header p{font-size:13px;color:#777;font-weight:500}
+#header-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0}
 .scoreboard{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)}
 .score-main{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
 .score-runs{font-size:60px;font-weight:900;color:#0F6E56;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,0.1);letter-spacing:-2px}
@@ -43,7 +43,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .tab:hover{color:#0F6E56;background:rgba(15,110,86,0.05)}
 .tab.active{background:rgba(15,110,86,0.05);color:#0F6E56;border-bottom:3px solid #0F6E56;font-weight:700}
 .scorecard-table{width:100%;font-size:13px;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:12px}
-.scorecard-table th{text-align:left;font-weight:700;font-size:12px;color:#fff;padding:10px 12px;background:linear-gradient(135deg,#0F6E56,#085041)}
+.scorecard-table th{text-align:left;font-weight:700;font-size:12px;color:#555;padding:10px 12px;background:#f0f2f4;border-bottom:2px solid #e0e0e0}
 .scorecard-table td{padding:9px 12px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;font-weight:500}
 .scorecard-table td:last-child,.scorecard-table th:last-child{text-align:right}
 .scorecard-table tr:hover{background:#f9faf8}
@@ -169,14 +169,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .chip-name{font-size:13px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
 .chip-stat{font-size:11px;color:#888;margin-top:1px}
 .chip-label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-#main-content{padding:16px;background:#f8faf7;min-height:calc(100vh - 120px)}
+#main-content{padding:16px;background:#f2f4f6;min-height:calc(100vh - 80px)}
 </style>
 </head>
 <body>
 <div class="ca-credit">&#9733; CA Bijay Pokhrel</div>
 <div class="app">
   <div class="header">
-    <h1 id="match-title" style="display:flex;align-items:center;gap:10px"><img id="header-logo" src="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5);display:none">🏏 Saturday Cricket Team </h1>
+    <h1 id="match-title" style="display:flex;align-items:center;gap:10px"><img id="header-logo" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;display:none">🏏 Saturday Cricket Team </h1>
     <p id="match-subtitle">Set up a new match to begin</p>
   </div>
   <div id="main-content"></div>
