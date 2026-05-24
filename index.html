@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Saturday Cricket Team </title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0F6E56">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cricket">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -11,7 +17,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:#0F6E56;border-radius:3px}
 .app{max-width:520px;margin:0 auto;padding:0}
-.header{background:#fff;color:#1a1a1a;border-radius:0;padding:14px 16px;margin-bottom:0;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-bottom:3px solid #0F6E56}
+.header{background:#fff;color:#1a1a1a;border-radius:0;padding:14px 16px;margin-bottom:0;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:sticky;top:0;z-index:100;border-bottom:3px solid #0F6E56}
 .header h1{font-size:20px;font-weight:800;margin-bottom:2px;letter-spacing:-0.5px;color:#1a1a1a}
 .header p{font-size:13px;color:#777;font-weight:500}
 #header-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0}
@@ -126,13 +132,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
   .dism-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media print{
-  body{background:#fff}
-  .app{max-width:100%;padding:0}
-  .no-print{display:none!important}
-  .print-only{display:block!important}
-  .pdf-report{page-break-inside:avoid}
-  .ca-credit{position:fixed;top:10px;right:10px;font-size:11px;font-weight:700;color:#0F6E56;opacity:1}
+  body > *:not(#print-overlay){display:none!important}
+  #print-overlay{display:block!important;margin:0;padding:24px}
 }
+#print-overlay{display:none}
 .print-only{display:none}
 .pdf-report{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:12px}
 .pdf-report h2{font-size:16px;font-weight:700;color:#0F6E56;margin-bottom:4px}
@@ -467,47 +470,35 @@ function saveBowlerName(){
   S.editBowler=false; render();
 }
 
-function exportPDF(){
-  var w=window.open('','_blank');
-  var t1=S.match.team1, t2=S.match.team2;
-  var bat1=S.match.batFirst, bat2=bat1===t1?t2:t1;
-  var s1=S.inn1score||S.t1;
-  var s2=(S.innings===2||S.phase==='result')?S.t2:{runs:0,wickets:0,balls:0,wide:0,nb:0};
-  var b1=S.inn1batting.length?S.inn1batting:S.batting;
-  var bw1=S.inn1bowling.length?S.inn1bowling:S.bowling;
-  var fow1=S.inn1fow.length?S.inn1fow:S.fow;
-  var b2=(S.innings===2||S.phase==='result')?S.batting:[];
-  var bw2=(S.innings===2||S.phase==='result')?S.bowling:[];
-  var fow2=(S.innings===2||S.phase==='result')?S.fow:[];
+function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo2, showResult){
+  var bat1=matchObj.batFirst, bat2=bat1===matchObj.team1?matchObj.team2:matchObj.team1;
   var result='';
-  if(S.phase==='result'){
-    result=s1.runs>s2.runs?bat1+' won by '+(s1.runs-s2.runs)+' runs'
-          :s2.runs>s1.runs?bat2+' won by '+(10-s2.wickets)+' wickets'
+  if(showResult){
+    result=s1.runs>s2.runs?bat1+' won by '+(s1.runs-s2.runs)+' run'+(s1.runs-s2.runs!==1?'s':'')
+          :s2.runs>s1.runs?bat2+' won by '+(10-s2.wickets)+' wicket'+(10-s2.wickets!==1?'s':'')
           :'Match tied!';
   }
-  function batRows(arr, orderArr){
-    var order=orderArr||[];
+  function _overs(s){ return Math.floor(s.balls/6)+'.'+s.balls%6; }
+  function _rr(s){ return s.balls>0?((s.runs/(s.balls/6))).toFixed(2):'0.00'; }
+  function batRows(arr, order){
     var notBatted=[];
     for(var ii=0;ii<arr.length;ii++){ if(order.indexOf(ii)<0) notBatted.push(ii); }
-    var sortedIdxs=order.concat(notBatted);
-    return sortedIdxs.map(function(i){
-      var b=arr[i];
-      var status, statusColor;
-      if(b.out){ status=b.howOut; statusColor='#791F1F'; }
-      else if(b.retiredHurt){ status='retired hurt'; statusColor='#aaa'; }
-      else if(b.balls>0){ status='not out'; statusColor='#0F6E56'; }
-      else { status='did not bat'; statusColor='#aaa'; }
-      var runsDisplay=b.balls>0?b.runs:'-';
-      var ballsDisplay=b.balls>0?b.balls:'-';
-      var foursDisplay=b.balls>0?b.fours:'-';
-      var sixesDisplay=b.balls>0?b.sixes:'-';
-      var srDisplay=b.balls>0?((b.runs/b.balls)*100).toFixed(0):'-';
-      return '<tr><td>'+b.name+'</td><td style="color:'+statusColor+';font-size:11px;font-style:'+(b.balls===0&&!b.out?'italic':'normal')+'">'+status+'</td><td>'+runsDisplay+'</td><td>'+ballsDisplay+'</td><td>'+foursDisplay+'</td><td>'+sixesDisplay+'</td><td>'+srDisplay+'</td></tr>';
+    var idxs=order.concat(notBatted);
+    return idxs.map(function(i){
+      var b=arr[i]; if(!b) return '';
+      var status, sc;
+      if(b.out){ status=b.howOut; sc='#791F1F'; }
+      else if(b.retiredHurt){ status='retired hurt'; sc='#aaa'; }
+      else if(b.balls>0){ status='not out'; sc='#0F6E56'; }
+      else { status='did not bat'; sc='#aaa'; }
+      var r=b.balls>0?b.runs:'-', bl=b.balls>0?b.balls:'-';
+      var sr=b.balls>0?((b.runs/b.balls)*100).toFixed(0):'-';
+      return '<tr><td>'+b.name+'</td><td style="color:'+sc+';font-size:11px">'+status+'</td><td>'+r+'</td><td>'+bl+'</td><td>'+(b.balls>0?b.fours:'-')+'</td><td>'+(b.balls>0?b.sixes:'-')+'</td><td>'+sr+'</td></tr>';
     }).join('');
   }
   function bowlRows(arr){
     return arr.filter(function(b){return b.balls>0;}).map(function(b){
-      return '<tr><td>'+b.name+'</td><td>'+Math.floor(b.balls/6)+'.'+b.balls%6+'</td><td>'+b.runs+'</td><td>'+b.wickets+'</td><td>'+(b.balls>0?(b.runs/(b.balls/6)).toFixed(2):'-')+'</td></tr>';
+      return '<tr><td>'+b.name+'</td><td>'+Math.floor(b.balls/6)+'.'+b.balls%6+'</td><td>'+b.runs+'</td><td>'+b.wickets+'</td><td>'+(b.runs/(b.balls/6)).toFixed(2)+'</td></tr>';
     }).join('');
   }
   function fowRows(arr){
@@ -515,8 +506,7 @@ function exportPDF(){
       return '<tr><td>'+(i+1)+'</td><td>'+f.score+'/'+f.wkts+'</td><td>'+f.name+'</td><td>'+f.over+'</td></tr>';
     }).join('');
   }
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Match Report</title>'+
-    '<style>body{font-family:Arial,sans-serif;font-size:13px;color:#111;margin:24px}'+
+  var css='body{font-family:Arial,sans-serif;font-size:13px;color:#111;margin:24px}'+
     'h1{color:#0F6E56;font-size:20px;margin-bottom:2px}'+
     '.meta{color:#888;font-size:12px;margin-bottom:16px}'+
     '.result{background:#E1F5EE;color:#0F6E56;padding:10px 14px;border-radius:6px;font-size:15px;font-weight:700;text-align:center;margin-bottom:18px}'+
@@ -530,35 +520,66 @@ function exportPDF(){
     'th{text-align:left;font-size:11px;color:#888;font-weight:600;padding:5px 6px;border-bottom:2px solid #eee;background:#f7f7f5}'+
     'td{padding:5px 6px;border-bottom:1px solid #f0f0ee}'+
     'td:last-child,th:last-child{text-align:right}'+
-    '.extras{font-size:12px;color:#666;margin-top:-8px;margin-bottom:12px}'+
-    '@media print{button{display:none}}'+
-    '</style></head><body>'+
-    '<button onclick="window.print()" style="background:#0F6E56;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:14px;cursor:pointer;margin-bottom:16px">&#128438; Print / Save as PDF</button>'+
+    '.extras{font-size:12px;color:#666;margin-top:-8px;margin-bottom:12px}';
+  return '<style>'+css+'</style>'+
     '<h1>&#127955; Match Report</h1>'+
     '<div style="font-size:11px;color:#0F6E56;font-weight:700;float:right;margin-top:-28px">&#9733; CA Bijay Pokhrel</div>'+
-    '<div class="meta">'+t1+' vs '+t2+' &nbsp;|&nbsp; '+S.match.overs+' overs &nbsp;|&nbsp; '+bat1+' batted first</div>'+
+    '<div class="meta">'+matchObj.team1+' vs '+matchObj.team2+' &nbsp;|&nbsp; '+matchObj.overs+' overs &nbsp;|&nbsp; '+bat1+' batted first</div>'+
     (result?'<div class="result">'+result+'</div>':'')+
     '<div class="summary">'+
-      '<div class="sum-box"><h3>'+bat1+' (Inn. 1)</h3><div class="sum-score">'+s1.runs+'/'+s1.wickets+'</div><div class="sum-detail">'+overs(s1)+' overs &nbsp;|&nbsp; RR: '+rr(s1)+'</div></div>'+
-      ((S.innings===2||S.phase==='result')?'<div class="sum-box"><h3>'+bat2+' (Inn. 2)</h3><div class="sum-score">'+s2.runs+'/'+s2.wickets+'</div><div class="sum-detail">'+overs(s2)+' overs &nbsp;|&nbsp; RR: '+rr(s2)+'</div></div>':'')+
+      '<div class="sum-box"><h3>'+bat1+' (Inn. 1)</h3><div class="sum-score">'+s1.runs+'/'+s1.wickets+'</div><div class="sum-detail">'+_overs(s1)+' ov &nbsp;|&nbsp; RR: '+_rr(s1)+'</div></div>'+
+      (b2.length?'<div class="sum-box"><h3>'+bat2+' (Inn. 2)</h3><div class="sum-score">'+s2.runs+'/'+s2.wickets+'</div><div class="sum-detail">'+_overs(s2)+' ov &nbsp;|&nbsp; RR: '+_rr(s2)+'</div></div>':'')+
     '</div>'+
     '<h2>'+bat1+' &mdash; Batting</h2>'+
-    '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b1,S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder)+'</table>'+
-    '<div class="extras">Extras: Wide '+s1.wide+' &nbsp; No Ball '+s1.nb+' &nbsp; Total '+s1.runs+'/'+s1.wickets+' ('+overs(s1)+' ov)</div>'+
+    '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b1,bo1)+'</table>'+
+    '<div class="extras">Extras: Wide '+(s1.wide||0)+' &nbsp; No Ball '+(s1.nb||0)+' &nbsp; Total '+s1.runs+'/'+s1.wickets+' ('+_overs(s1)+' ov)</div>'+
     (fow1.length?'<h2>Fall of Wickets &mdash; '+bat1+'</h2><table><tr><th>Wkt</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+fowRows(fow1)+'</table>':'')+
     '<h2>'+bat2+' &mdash; Bowling (Inn. 1)</h2>'+
     '<table><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>'+bowlRows(bw1)+'</table>'+
     (b2.length?
       '<h2>'+bat2+' &mdash; Batting</h2>'+
-      '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b2,S.battingOrder)+'</table>'+
-      '<div class="extras">Extras: Wide '+s2.wide+' &nbsp; No Ball '+s2.nb+' &nbsp; Total '+s2.runs+'/'+s2.wickets+' ('+overs(s2)+' ov)</div>'+
+      '<table><tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>'+batRows(b2,bo2)+'</table>'+
+      '<div class="extras">Extras: Wide '+(s2.wide||0)+' &nbsp; No Ball '+(s2.nb||0)+' &nbsp; Total '+s2.runs+'/'+s2.wickets+' ('+_overs(s2)+' ov)</div>'+
       (fow2.length?'<h2>Fall of Wickets &mdash; '+bat2+'</h2><table><tr><th>Wkt</th><th>Score</th><th>Batsman</th><th>Over</th></tr>'+fowRows(fow2)+'</table>':'')+
       '<h2>'+bat1+' &mdash; Bowling (Inn. 2)</h2>'+
       '<table><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr>'+bowlRows(bw2)+'</table>'
-    :'')+
-    '</body></html>';
-  w.document.write(html);
-  w.document.close();
+    :'');
+}
+
+function printOverlay(html){
+  var el=document.getElementById('print-overlay');
+  if(!el){ el=document.createElement('div'); el.id='print-overlay'; document.body.appendChild(el); }
+  el.innerHTML=html;
+  window.print();
+  setTimeout(function(){ el.innerHTML=''; },1000);
+}
+
+function exportPDF(){
+  var s1=S.inn1score||S.t1;
+  var s2=(S.innings===2||S.phase==='result')?S.t2:{runs:0,wickets:0,balls:0,wide:0,nb:0};
+  var b1=S.inn1batting.length?S.inn1batting:S.batting;
+  var bw1=S.inn1bowling.length?S.inn1bowling:S.bowling;
+  var fow1=S.inn1fow.length?S.inn1fow:S.fow;
+  var b2=(S.innings===2||S.phase==='result')?S.batting:[];
+  var bw2=(S.innings===2||S.phase==='result')?S.bowling:[];
+  var fow2=(S.innings===2||S.phase==='result')?S.fow:[];
+  var bo1=S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder;
+  printOverlay(buildReportHTML(S.match,s1,s2,b1,bw1,fow1,b2,bw2,fow2,bo1,S.battingOrder,S.phase==='result'));
+}
+
+function printHistoryMatch(idx){
+  var history=getMatchHistory();
+  var m=history[idx];
+  if(!m||!m.inn1batting) return;
+  var s1=m.inn1, s2=m.inn2||{runs:0,wickets:0,balls:0};
+  printOverlay(buildReportHTML(
+    {team1:m.team1,team2:m.team2,batFirst:m.batFirst,overs:m.overs},
+    s1, s2,
+    m.inn1batting, m.inn1bowling||[], m.inn1fow||[],
+    m.inn2batting||[], m.inn2bowling||[], m.inn2fow||[],
+    m.inn1battingOrder||[], m.inn2battingOrder||[],
+    true
+  ));
 }
 
 function confirmNewBatsman(){
@@ -1681,6 +1702,7 @@ document.addEventListener('click', function(e){
     case 'save-bowler':            saveBowlerName(); break;
     case 'cancel-edit-bowler':     S.editBowler=false; render(); break;
     case 'export-pdf':             exportPDF(); break;
+    case 'print-history':          printHistoryMatch(parseInt(val)); break;
     case 'set-dismissal':          S.dismissalType=val; render(); break;
     case 'confirm-dismissal':      confirmDismissal(S.dismissalType); break;
     case 'cancel-dismissal':       S.dismissalPending=false; S.dismissalType=''; render(); break;
@@ -1815,21 +1837,35 @@ function saveMatchToHistory(){
     if(s1.runs>s2.runs) result=bat1+' won by '+(s1.runs-s2.runs)+' run'+(s1.runs-s2.runs!==1?'s':'');
     else if(s2.runs>s1.runs) result=bat2+' won by '+(10-s2.wickets)+' wicket'+(10-s2.wickets!==1?'s':'');
     else result='Match tied';
+    var b1=S.inn1batting.length?S.inn1batting:S.batting;
+    var bw1=S.inn1bowling.length?S.inn1bowling:S.bowling;
+    var fow1=S.inn1fow.length?S.inn1fow:S.fow;
+    var b2=S.innings===2||S.phase==='result'?S.batting:[];
+    var bw2=S.innings===2||S.phase==='result'?S.bowling:[];
+    var fow2=S.innings===2||S.phase==='result'?S.fow:[];
     var entry = {
       id: Date.now(),
       date: new Date().toLocaleDateString(),
       team1: S.match.team1, team2: S.match.team2,
       batFirst: bat1,
       overs: S.match.overs,
-      inn1: {runs:s1.runs, wickets:s1.wickets, balls:s1.balls},
-      inn2: {runs:s2.runs, wickets:s2.wickets, balls:s2.balls},
+      inn1: {runs:s1.runs, wickets:s1.wickets, balls:s1.balls, wide:s1.wide||0, nb:s1.nb||0},
+      inn2: {runs:s2.runs, wickets:s2.wickets, balls:s2.balls, wide:s2.wide||0, nb:s2.nb||0},
       result: result,
-      bat1players: (S.inn1batting.length?S.inn1batting:S.batting).map(function(b){ return b.name; }),
-      bat2players: (S.innings===2||S.phase==='result'?S.batting:S.inn1batting).map(function(b){ return b.name; })
+      bat1players: b1.map(function(b){ return b.name; }),
+      bat2players: b2.length?b2.map(function(b){ return b.name; }):[],
+      inn1batting: JSON.parse(JSON.stringify(b1)),
+      inn1bowling: JSON.parse(JSON.stringify(bw1)),
+      inn1fow: JSON.parse(JSON.stringify(fow1)),
+      inn1battingOrder: (S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder).slice(),
+      inn2batting: JSON.parse(JSON.stringify(b2)),
+      inn2bowling: JSON.parse(JSON.stringify(bw2)),
+      inn2fow: JSON.parse(JSON.stringify(fow2)),
+      inn2battingOrder: S.battingOrder.slice()
     };
     var history = getMatchHistory();
     history.unshift(entry);
-    if(history.length>2) history=history.slice(0,2); // keep last 2 matches
+    if(history.length>3) history=history.slice(0,3);
     localStorage.setItem('cricket_history', JSON.stringify(history));
   } catch(e){}
 }
@@ -1855,29 +1891,111 @@ function showToast(msg){
   t._timer=setTimeout(function(){ t.style.opacity='0'; },2200);
 }
 
+function _histBatTable(teamName, batting, order, wide, nb){
+  if(!batting||!batting.length) return '';
+  var notBatted=[];
+  for(var i=0;i<batting.length;i++) if(order.indexOf(i)<0) notBatted.push(i);
+  var idxs=order.length?order.concat(notBatted):batting.map(function(_,i){return i;});
+  var rows=idxs.map(function(i){
+    var b=batting[i]; if(!b) return '';
+    var status,sc;
+    if(b.out){status=b.howOut;sc='#c0392b';}
+    else if(b.retiredHurt){status='ret. hurt';sc='#aaa';}
+    else if(b.balls>0){status='not out';sc='#0F6E56';}
+    else{status='dnb';sc='#ccc';}
+    var r=b.balls>0?'<strong>'+b.runs+'</strong>':'-';
+    return '<tr><td style="padding:4px 6px;font-size:12px;font-weight:600">'+b.name+'</td>'+
+      '<td style="padding:4px 6px;font-size:11px;color:'+sc+'">'+status+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+r+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+(b.balls>0?b.balls:'-')+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+(b.balls>0?b.fours:'-')+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+(b.balls>0?b.sixes:'-')+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+(b.balls>0?((b.runs/b.balls)*100).toFixed(0):'-')+'</td></tr>';
+  }).join('');
+  return '<div style="margin:0 14px 8px">'+
+    '<div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+teamName+' — Batting</div>'+
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<tr style="border-bottom:2px solid #f0f0f0"><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:left">Batsman</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:left">Status</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">R</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">B</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">4s</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">6s</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">SR</th></tr>'+
+    rows+'</table>'+
+    '<div style="font-size:11px;color:#999;margin-top:3px">Extras: Wd '+(wide||0)+' &nbsp; Nb '+(nb||0)+'</div>'+
+    '</div>';
+}
+function _histBowlTable(teamName, bowling){
+  if(!bowling||!bowling.length) return '';
+  var rows=bowling.filter(function(b){return b.balls>0;}).map(function(b){
+    return '<tr><td style="padding:4px 6px;font-size:12px;font-weight:600">'+b.name+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+Math.floor(b.balls/6)+'.'+b.balls%6+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+b.runs+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right;font-weight:700;color:#791F1F">'+b.wickets+'</td>'+
+      '<td style="padding:4px 6px;font-size:12px;text-align:right">'+(b.runs/(b.balls/6)).toFixed(1)+'</td></tr>';
+  }).join('');
+  if(!rows) return '';
+  return '<div style="margin:0 14px 10px">'+
+    '<div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+teamName+' — Bowling</div>'+
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<tr style="border-bottom:2px solid #f0f0f0"><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:left">Bowler</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">O</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">R</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">W</th><th style="padding:3px 6px;font-size:10px;color:#999;font-weight:600;text-align:right">Econ</th></tr>'+
+    rows+'</table></div>';
+}
+function _histFowRow(teamName, fow){
+  if(!fow||!fow.length) return '';
+  var chips=fow.map(function(f,i){
+    return '<span style="font-size:11px;background:#f5f5f5;border-radius:6px;padding:2px 7px;color:#555">'+(i+1)+'/'+f.score+' '+f.name+'</span>';
+  }).join(' ');
+  return '<div style="margin:0 14px 10px">'+
+    '<div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">FoW — '+teamName+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px">'+chips+'</div></div>';
+}
+
 function renderHistory(){
   var history=getMatchHistory();
   var hasSaved=hasSavedProgress();
-  var html='<div class="setup-panel"><h3>&#128202; Match History</h3>';
+  var html='<div class="setup-panel"><h3>&#128202; Match History (last 3)</h3>';
   if(!history.length){
     html+='<p style="font-size:13px;color:#aaa;margin-bottom:12px">No previous matches recorded yet.</p>';
   } else {
     history.forEach(function(m,idx){
+      var bat1=m.batFirst, bat2=bat1===m.team1?m.team2:m.team1;
       var ov1=Math.floor(m.inn1.balls/6)+'.'+m.inn1.balls%6;
-      var ov2=Math.floor(m.inn2.balls/6)+'.'+m.inn2.balls%6;
-      html+=
-        '<div style="border:1px solid #e0e0e0;border-radius:10px;padding:12px;margin-bottom:10px;background:#fafafa">'+
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'+
-            '<div style="font-size:13px;font-weight:700;color:#1a1a1a">'+m.team1+' vs '+m.team2+'</div>'+
-            '<div style="font-size:11px;color:#aaa">'+m.date+'</div>'+
-          '</div>'+
-          '<div style="font-size:12px;color:#555;margin-bottom:4px">'+m.batFirst+': '+m.inn1.runs+'/'+m.inn1.wickets+' ('+ov1+' ov)</div>'+
-          '<div style="font-size:12px;color:#555;margin-bottom:6px">'+(m.batFirst===m.team1?m.team2:m.team1)+': '+m.inn2.runs+'/'+m.inn2.wickets+' ('+ov2+' ov)</div>'+
-          '<div style="font-size:12px;font-weight:600;color:#0F6E56;margin-bottom:8px">'+m.result+'</div>'+
-          '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
-            '<button class="btn-secondary" style="width:auto;padding:6px 10px;font-size:12px;margin:0" data-action="use-players" data-val="'+idx+'">&#128101; Use players from this match</button>'+
-          '</div>'+
+      var ov2=m.inn2?Math.floor(m.inn2.balls/6)+'.'+m.inn2.balls%6:'0.0';
+      var hasDetail=!!(m.inn1batting&&m.inn1batting.length);
+      html+='<div style="border:1px solid #e0e0e0;border-radius:12px;margin-bottom:14px;background:#fff;overflow:hidden">';
+      // Header row
+      html+='<div style="background:#f7f9f7;padding:11px 14px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div><div style="font-size:13px;font-weight:700;color:#1a1a1a">'+m.team1+' vs '+m.team2+'</div>'+
+        '<div style="font-size:12px;font-weight:600;color:#0F6E56;margin-top:2px">'+m.result+'</div></div>'+
+        '<div style="font-size:11px;color:#aaa;text-align:right">'+m.date+'<br><span style="color:#bbb">'+m.overs+' overs</span></div>'+
         '</div>';
+      // Score summary bar
+      html+='<div style="padding:10px 14px;background:#E1F5EE;display:flex;align-items:center;gap:16px;border-bottom:1px solid #d4eee4">'+
+        '<div><div style="font-size:11px;color:#555;font-weight:700">'+bat1+'</div>'+
+        '<div style="font-size:22px;font-weight:900;color:#0F6E56;line-height:1.1">'+m.inn1.runs+'/'+m.inn1.wickets+'</div>'+
+        '<div style="font-size:11px;color:#777">('+ov1+' ov)</div></div>'+
+        '<div style="font-size:18px;color:#9FE1CB;font-weight:300">vs</div>'+
+        '<div><div style="font-size:11px;color:#555;font-weight:700">'+bat2+'</div>'+
+        '<div style="font-size:22px;font-weight:900;color:#0F6E56;line-height:1.1">'+m.inn2.runs+'/'+m.inn2.wickets+'</div>'+
+        '<div style="font-size:11px;color:#777">('+ov2+' ov)</div></div>'+
+        '</div>';
+      // Full details
+      if(hasDetail){
+        html+='<div style="padding-top:10px">';
+        html+=_histBatTable(bat1, m.inn1batting, m.inn1battingOrder||[], m.inn1.wide, m.inn1.nb);
+        html+=_histFowRow(bat1, m.inn1fow);
+        html+=_histBowlTable(bat2, m.inn1bowling);
+        if(m.inn2batting&&m.inn2batting.length){
+          html+='<div style="border-top:1px solid #f0f0f0;padding-top:8px">';
+          html+=_histBatTable(bat2, m.inn2batting, m.inn2battingOrder||[], m.inn2.wide, m.inn2.nb);
+          html+=_histFowRow(bat2, m.inn2fow);
+          html+=_histBowlTable(bat1, m.inn2bowling);
+          html+='</div>';
+        }
+        html+='</div>';
+      }
+      // Action buttons
+      html+='<div style="padding:10px 14px;border-top:1px solid #f0f0f0;display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button class="btn-secondary" style="width:auto;padding:6px 10px;font-size:12px;margin:0" data-action="use-players" data-val="'+idx+'">&#128101; Use players</button>'+
+        (hasDetail?'<button class="btn-secondary" style="width:auto;padding:6px 10px;font-size:12px;margin:0" data-action="print-history" data-val="'+idx+'">&#128438; Print / PDF</button>':'')+
+        '</div>';
+      html+='</div>';
     });
   }
   if(hasSaved){
@@ -1902,6 +2020,13 @@ window.addEventListener('beforeunload', function(e){
     return e.returnValue;
   }
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
 </script>
 </body>
 </html>
