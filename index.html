@@ -777,21 +777,28 @@ function _loadPeerJS(cb){
   var s=document.createElement('script');
   s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
   s.onload=cb;
-  s.onerror=function(){showToast('PeerJS unavailable — sharing link instead');};
+  s.onerror=function(){showToast('PeerJS unavailable — using link share');shareWithLink();};
   document.head.appendChild(s);
 }
 
-function _liveURL(code,enc){
-  return location.href.split('#')[0]+'#live='+code+(enc?'&s='+enc:'');
+function _roomCode(){
+  var c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',r='';
+  for(var i=0;i<6;i++) r+=c[Math.floor(Math.random()*c.length)];
+  return r;
 }
 
-function _doShare(url){
+function _liveURL(code){
+  return location.href.split('#')[0]+'#live='+code;
+}
+
+function _doShare(url,roomCode){
+  var txt=S.match.team1+' vs '+S.match.team2+(roomCode?' (Room: '+roomCode+')':'');
   if(navigator.share){
-    navigator.share({title:'Live Cricket Score',text:S.match.team1+' vs '+S.match.team2,url:url}).catch(function(){});
+    navigator.share({title:'Live Cricket Score',text:txt,url:url}).catch(function(){});
   } else if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(function(){showToast('🔗 Live link copied — viewers get instant updates!');}).catch(function(){prompt('Share this live link:',url);});
+    navigator.clipboard.writeText(url).then(function(){showToast('🔗 Copied! Room: '+roomCode);}).catch(function(){prompt('Share this live link:',url);});
   } else {
-    prompt('Share this live link:',url);
+    prompt('Share this live link (Room: '+roomCode+'):',url);
   }
 }
 
@@ -802,22 +809,21 @@ function _broadcastToViewers(){
 }
 
 function _setLiveBtn(label){
-  var btns=document.querySelectorAll('[data-action="share-match"]');
-  btns.forEach(function(b){b.textContent=label;});
+  document.querySelectorAll('[data-action="share-match"]').forEach(function(b){b.textContent=label;});
 }
 
 function startLiveRoom(){
-  if(LIVE.hosting&&LIVE.code){_doShare(_liveURL(LIVE.code,encodeShareState()));return;}
+  if(LIVE.hosting&&LIVE.code){_doShare(_liveURL(LIVE.code),LIVE.code);return;}
+  showToast('Starting live room...');
   _loadPeerJS(function(){
-    var code='cric-'+Math.random().toString(36).substr(2,8);
+    var code=_roomCode();
     try{
       var peer=new Peer(code,{debug:0});
       peer.on('open',function(id){
         LIVE.peer=peer; LIVE.code=id; LIVE.hosting=true;
-        showToast('🟢 Live room open!');
-        _setLiveBtn('📡 Share Live');
+        _setLiveBtn('📡 Room: '+id);
         updateShareHash();
-        _doShare(_liveURL(id,encodeShareState()));
+        _doShare(_liveURL(id),id);
       });
       peer.on('connection',function(conn){
         LIVE.conns.push(conn);
@@ -829,10 +835,10 @@ function startLiveRoom(){
           LIVE.conns=LIVE.conns.filter(function(c){return c!==conn;});
         });
       });
-      peer.on('error',function(err){
-        showToast('Live room error — using link share');
-        LIVE.hosting=false;
-        shareWithLink();
+      peer.on('error',function(){
+        showToast('Room taken — trying new code...');
+        LIVE.hosting=false; LIVE.code=null;
+        setTimeout(startLiveRoom,500);
       });
     }catch(e){shareWithLink();}
   });
@@ -841,13 +847,10 @@ function startLiveRoom(){
 function shareWithLink(){
   var enc=encodeShareState();
   if(!enc){showToast('Could not generate share link');return;}
-  var url=location.href.split('#')[0]+'#s='+enc;
-  _doShare(url);
+  _doShare(location.href.split('#')[0]+'#s='+enc,'');
 }
 
-function shareMatch(){
-  startLiveRoom();
-}
+function shareMatch(){ startLiveRoom(); }
 
 function joinLiveRoom(code){
   _loadPeerJS(function(){
@@ -855,22 +858,20 @@ function joinLiveRoom(code){
       var peer=new Peer({debug:0});
       LIVE.peer=peer;
       peer.on('open',function(){
-        var conn=peer.connect(code,{reliable:true});
+        var conn=peer.connect(code,{reliable:true,serialization:'raw'});
         LIVE.conn=conn;
-        conn.on('open',function(){
-          _updateLiveDot('🟢 LIVE');
-        });
+        conn.on('open',function(){ _updateLiveDot('🟢 LIVE'); });
         conn.on('data',function(enc){
           try{
             var d=JSON.parse(decodeURIComponent(escape(atob(enc))));
             if(d&&d.v) renderSharedView(d,true);
           }catch(e){}
         });
-        conn.on('close',function(){_updateLiveDot('⚪ Scorer offline');});
-        conn.on('error',function(){_updateLiveDot('⚪ Cannot connect');});
+        conn.on('close',function(){ _updateLiveDot('⚪ Scorer offline'); });
+        conn.on('error',function(){ _updateLiveDot('⚪ Cannot connect'); });
       });
-      peer.on('error',function(){_updateLiveDot('⚪ Cannot connect');});
-    }catch(e){_updateLiveDot('⚪ Cannot connect');}
+      peer.on('error',function(){ _updateLiveDot('⚪ Cannot connect'); });
+    }catch(e){ _updateLiveDot('⚪ Cannot connect'); }
   });
 }
 
@@ -882,7 +883,7 @@ function _updateLiveDot(label){
 function updateShareHash(){
   var enc=encodeShareState();
   if(!enc) return;
-  var hash=LIVE.hosting&&LIVE.code?'#live='+LIVE.code+'&s='+enc:'#s='+enc;
+  var hash=LIVE.hosting&&LIVE.code?'#live='+LIVE.code:'#s='+enc;
   history.replaceState(null,'',location.pathname+hash);
   _broadcastToViewers();
 }
@@ -2286,17 +2287,19 @@ function renderHistory(){
 // Check if opened via a share/live link
 (function(){
   var hash=location.hash;
-  var liveM=hash.match(/[#&]live=([^&]+)/);
+  var liveM=hash.match(/[#&]live=([A-Z0-9]{6})/);
   var stateM=hash.match(/[#&]s=([^&]+)/);
   if(liveM){
-    // Live P2P link — show snapshot immediately, then connect
-    if(stateM){
-      try{
-        var d=JSON.parse(decodeURIComponent(escape(atob(stateM[1]))));
-        if(d&&d.v) renderSharedView(d);
-      }catch(e){ document.getElementById('main-content').innerHTML='<div class="setup-panel"><p style="color:#aaa;font-size:14px">Loading live score...</p></div>'; }
-    }
-    joinLiveRoom(liveM[1]);
+    var code=liveM[1];
+    document.getElementById('main-content').innerHTML=
+      '<div class="setup-panel" style="text-align:center;padding:40px 20px">'+
+      '<div style="font-size:52px;margin-bottom:14px">🏏</div>'+
+      '<div style="font-size:18px;font-weight:800;margin-bottom:8px">Connecting to live score...</div>'+
+      '<div style="background:#E1F5EE;color:#0F6E56;border-radius:12px;padding:12px 20px;display:inline-block;font-size:28px;font-weight:900;letter-spacing:4px;margin:10px 0">'+code+'</div>'+
+      '<div style="font-size:13px;color:#aaa;margin-top:10px">Waiting for scorer&#8230;</div>'+
+      '<div id="live-dot" style="font-size:13px;color:#0F6E56;font-weight:600;margin-top:8px">⏳ Connecting...</div>'+
+      '</div>';
+    joinLiveRoom(code);
     return;
   }
   if(stateM){
