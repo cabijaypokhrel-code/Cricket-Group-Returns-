@@ -521,6 +521,13 @@ function saveBowlerName(){
   S.editBowler=false; render();
 }
 
+function orderedNames(arr, order){
+  if(!order || !order.length) return arr.map(function(b){ return b.name; });
+  var rest=[];
+  for(var i=0;i<arr.length;i++){ if(order.indexOf(i)<0) rest.push(i); }
+  return order.concat(rest).map(function(i){ return arr[i]&&arr[i].name; }).filter(Boolean);
+}
+
 function orderedBowlers(arr, order){
   if(!order || !order.length) return arr;
   var rest=[];
@@ -2208,8 +2215,8 @@ function saveMatchToHistory(){
       inn1: {runs:s1.runs, wickets:s1.wickets, balls:s1.balls, wide:s1.wide||0, nb:s1.nb||0},
       inn2: {runs:s2.runs, wickets:s2.wickets, balls:s2.balls, wide:s2.wide||0, nb:s2.nb||0},
       result: result,
-      bat1players: b1.map(function(b){ return b.name; }),
-      bat2players: b2.length?b2.map(function(b){ return b.name; }):[],
+      bat1players: orderedNames(b1, S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder),
+      bat2players: b2.length?orderedNames(b2, S.battingOrder):[],
       inn1batting: JSON.parse(JSON.stringify(b1)),
       inn1bowling: JSON.parse(JSON.stringify(bw1)),
       inn1fow: JSON.parse(JSON.stringify(fow1)),
