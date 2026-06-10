@@ -211,7 +211,7 @@ body.dark{--c-bg:#0f1117;--c-surface:#1a1d27;--c-surface-alt:#222535;--c-border:
 .dism-btn:hover{border-color:var(--c-red);box-shadow:var(--shadow-sm)}
 .dism-btn:active{transform:scale(.95)}
 .dism-btn-sel{border-color:var(--c-red);background:#f7d9d9;box-shadow:0 0 0 3px rgba(198,42,42,.12)}
-.dism-icon{font-size:21px;line-height:1;margin-bottom:4px}
+.dism-icon{font-size:30px;line-height:1;margin-bottom:4px}
 .dism-label{font-size:11.5px;font-weight:700;color:var(--c-red)}
 .dism-desc{font-size:9.5px;color:var(--c-text-faint);margin-top:2px;line-height:1.2}
 .dism-detail{background:var(--c-surface-alt);border-radius:var(--radius-sm);padding:13px;margin-bottom:10px;border:1px solid var(--c-border)}

@@ -267,10 +267,10 @@ function renderScoring(){
     var bname=bat().name;
     var wname=bowl().name;
     var types=[
-      {id:'bowled',    icon:'<img src="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Bowled",      desc:"Ball hits stumps"},
-      {id:'caught',    icon:'<img src="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Caught",     desc:"Fielder/keeper catch"},
-      {id:'stumped',   icon:'<img src="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Stumped",    desc:"Keeper hits stumps"},
-      {id:'runout',    icon:'<img src="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Run Out",    desc:"Direct / relay throw"},
+      {id:'bowled',    icon:'&#127951;', label:"Bowled",      desc:"Ball hits stumps"},
+      {id:'caught',    icon:'&#129309;', label:"Caught",     desc:"Fielder/keeper catch"},
+      {id:'stumped',   icon:'&#129354;', label:"Stumped",    desc:"Keeper hits stumps"},
+      {id:'runout',    icon:'&#127939;', label:"Run Out",    desc:"Direct / relay throw"},
       {id:'hitwicket', icon:'<svg viewBox="0 0 32 32" width="22" height="22"><rect x="20" y="12" width="3" height="10" rx="1" fill="#c8a96e"/><rect x="24" y="12" width="3" height="10" rx="1" fill="#c8a96e"/><rect x="20" y="11" width="7" height="2" rx="1" fill="#e8d5a3"/><path d="M6 26 Q10 18 16 12" fill="none" stroke="#c8a96e" stroke-width="4" stroke-linecap="round"/><path d="M14 14 Q18 10 20 13" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/></svg>', label:"Hit Wicket",  desc:"Bat hits stumps"},
       {id:'retiredhurt',icon:'&#129657;',label:'Retired Hurt',   desc:'Injury — can return'},
       {id:'retiredout', icon:'&#128683;',label:'Retired Out',    desc:'Voluntary — cannot return'},
@@ -424,7 +424,7 @@ function renderScoring(){
     }).join('');
     html+=
       '<div class="modal-box modal-blue">'+
-        '<div class="modal-title-blue" style="display:flex;align-items:center;gap:8px">'+(S.overDone?'<span>&#9989; Over complete! Pick next bowler</span>':'<img src="" style="width:44px;height:44px;object-fit:cover;border-radius:50%;border:2px solid #B5D4F4;flex-shrink:0"><span>Who is bowling the first over?</span>')+'</div>'+
+        '<div class="modal-title-blue" style="display:flex;align-items:center;gap:8px">'+(S.overDone?'<span>&#9989; Over complete! Pick next bowler</span>':'<span style="font-size:28px">&#127951;</span><span>Who is bowling the first over?</span>')+'</div>'+
         (prevChips?'<div class="chip-label">Previously bowled</div><div class="bowler-chip-grid">'+prevChips+'</div>':'')+
         (freshChips?'<div class="chip-label" style="margin-top:8px">Available (new)</div><div class="bowler-chip-grid">'+freshChips+'</div>':'')+
         '<div class="chip-label" style="margin-top:10px">Or type a name</div>'+
