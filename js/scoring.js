@@ -185,6 +185,7 @@ function endOver(){
 }
 
 function endInnings(){
+  S.confirmEndInnings=false;
   if(S.innings===1){
     S.inn1batting=JSON.parse(JSON.stringify(S.batting));
     S.inn1bowling=JSON.parse(JSON.stringify(S.bowling));
@@ -205,6 +206,7 @@ function endInnings(){
 
 function startInn2(){
   S.inn1Complete=false;
+  S.confirmEndInnings=false;
   S.innings=2;
   // Inn.2: the team that was BOWLING in Inn.1 now BATS
   //        the team that was BATTING in Inn.1 now BOWLS
