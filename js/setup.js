@@ -1,4 +1,4 @@
-// ── match.js ──────────────────────────────
+
 function confirmNewBatsman(){
   var inp=document.getElementById('new-bat-inp');
   var name=inp?inp.value.trim():'';
@@ -168,3 +168,4 @@ function applyTeamSetup(teamSetup, p1override, p2override){
   S.battingOrder=[0,1]; S.bowlingOrder=[];
   S.phase='scoring'; render();
 }
+

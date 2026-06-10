@@ -1,4 +1,3 @@
-// ── scoring.js ──────────────────────────────
 function doRuns(r){
   saveSnapshot();
   var s=sc(), b=bat(), w=bowl();
@@ -9,6 +8,9 @@ function doRuns(r){
   if(r===6) b.sixes++;
   S.thisBalls.push(String(r));
   S.partnershipRuns+=r; S.partnershipBalls++;
+  // Team milestone toasts
+  var prevTeamRuns=s.runs-r;
+  [50,100,150,200,250,300].forEach(function(m){ if(prevTeamRuns<m && s.runs>=m) showTeamMilestone(sc(), m); });
   // Milestone toasts
   [25,50,75,100,150,200].forEach(function(m){ if(prevRuns<m && b.runs>=m) showMilestone(b.name, b.runs); });
   // Hat-trick check
@@ -50,6 +52,9 @@ function doBye(r){
   s.runs+=r; s.byes=(s.byes||0)+r; w.runs+=r;
   s.balls++; w.balls++;
   S.partnershipRuns+=r; S.partnershipBalls++;
+  // Team milestone toasts
+  var prevTeamRuns=s.runs-r;
+  [50,100,150,200,250,300].forEach(function(m){ if(prevTeamRuns<m && s.runs>=m) showTeamMilestone(sc(), m); });
   S.thisBalls.push(r>0?'B+'+r:'B');
   if(r%2===1) swap();
   S.extrasPanel=null;
@@ -64,6 +69,9 @@ function doLegBye(r){
   s.runs+=r; s.legbyes=(s.legbyes||0)+r; w.runs+=r;
   s.balls++; w.balls++;
   S.partnershipRuns+=r; S.partnershipBalls++;
+  // Team milestone toasts
+  var prevTeamRuns=s.runs-r;
+  [50,100,150,200,250,300].forEach(function(m){ if(prevTeamRuns<m && s.runs>=m) showTeamMilestone(sc(), m); });
   S.thisBalls.push(r>0?'LB+'+r:'LB');
   if(r%2===1) swap();
   S.extrasPanel=null;
@@ -222,4 +230,18 @@ function saveBowlerName(){
   var name=inp?inp.value.trim():'';
   if(name) bowl().name=name;
   S.editBowler=false; render();
+}
+
+function orderedNames(arr, order){
+  if(!order || !order.length) return arr.map(function(b){ return b.name; });
+  var rest=[];
+  for(var i=0;i<arr.length;i++){ if(order.indexOf(i)<0) rest.push(i); }
+  return order.concat(rest).map(function(i){ return arr[i]&&arr[i].name; }).filter(Boolean);
+}
+
+function orderedBowlers(arr, order){
+  if(!order || !order.length) return arr;
+  var rest=[];
+  for(var i=0;i<arr.length;i++){ if(order.indexOf(i)<0) rest.push(i); }
+  return order.concat(rest).map(function(i){ return arr[i]; }).filter(Boolean);
 }

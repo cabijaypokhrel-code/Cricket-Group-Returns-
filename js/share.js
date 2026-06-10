@@ -1,4 +1,4 @@
-// ── share.js ──────────────────────────────
+// ── LIVE SHARE VIA URL ────────────────────────────────────────────────
 function encodeShareState(){
   function pb(arr){ return arr.map(function(b){ return [b.name,b.runs,b.balls,b.fours,b.sixes,b.out?1:0,b.howOut||'',b.retiredHurt?1:0]; }); }
   function pw(arr){ return arr.filter(function(b){return b.balls>0;}).map(function(b){ return [b.name,b.balls,b.runs,b.wickets]; }); }

@@ -1,4 +1,4 @@
-// ── report.js ──────────────────────────────
+
 function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo2, showResult, bwo1, bwo2){
   var bat1=matchObj.batFirst, bat2=bat1===matchObj.team1?matchObj.team2:matchObj.team1;
   var result='';

@@ -1,4 +1,4 @@
-// ── render.js ──────────────────────────────
+
 function render(){
   var t1=S.match.team1, t2=S.match.team2;
   var logoEl=document.getElementById('header-logo');
@@ -81,7 +81,7 @@ function renderScoring(){
           '<div style="background:rgba(0,0,0,0.12);border-radius:8px;height:8px;overflow:hidden">'+
             '<div style="background:linear-gradient(90deg,'+meterColor+','+meterColor+'cc);width:'+chasePct+'%;height:100%;border-radius:8px;transition:width 0.4s ease"></div>'+
           '</div>'+
-          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.75);margin-top:4px">'+
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--c-text-soft);margin-top:4px">'+
             '<span>'+s.runs+' scored</span>'+
             '<span>Target: '+tgt+'</span>'+
           '</div>'+
@@ -942,4 +942,137 @@ function renderResult(){
     '<button class="btn-export" data-action="export-pdf" style="margin-bottom:8px">&#128438; Export Match Report (PDF)</button>'+
     '<button class="btn-secondary" data-action="new-match">&#128260; New Match</button>';
 }
+
+// Single delegated listener — no inline onclick anywhere
+document.addEventListener('click', function(e){
+  var el=e.target;
+  while(el && el!==document.body){
+    if(el.dataset && el.dataset.action) break;
+    el=el.parentElement;
+  }
+  if(!el || !el.dataset || !el.dataset.action) return;
+  var action=el.dataset.action;
+  var val=el.dataset.val;
+  switch(action){
+    case 'start-match':           startMatch(); break;
+    case 'runs':                  doRuns(parseInt(val)); break;
+    case 'wicket':                doWicket(); break;
+    case 'open-extras':           S.extrasPanel=val; render(); break;
+    case 'bye':                    doBye(parseInt(val)); break;
+    case 'legbye':                 doLegBye(parseInt(val)); break;
+    case 'wide':                  doWide(parseInt(val)); break;
+    case 'noball':                doNoBall(parseInt(val)); break;
+    case 'cancel-extras':         S.extrasPanel=null; render(); break;
+    case 'swap-batters':          swap(); render(); break;
+    case 'edit-striker':          S.editStriker=true; render(); break;
+    case 'save-striker':          saveStrikerName(); break;
+    case 'cancel-edit-striker':   S.editStriker=false; render(); break;
+    case 'confirm-batsman':       confirmNewBatsman(); break;
+    case 'confirm-bowler':        confirmBowler(); break;
+    case 'end-innings':           S.confirmEndInnings=true; render(); break;
+    case 'confirm-end-innings':   S.confirmEndInnings=false; endInnings(); break;
+    case 'cancel-end-innings':    S.confirmEndInnings=false; render(); break;
+    case 'new-match':             resetMatch(); break;
+    case 'start-inn2':            startInn2(); break;
+    case 'show-history':          S.phase='history'; renderHistory(); break;
+    case 'back-to-setup':         S.phase='setup'; render(); break;
+    case 'save-progress':         saveProgress(); break;
+    case 'load-progress':         loadProgress(); break;
+    case 'clear-progress':        clearProgress(); renderHistory(); break;
+    case 'use-players':
+      var hist=getMatchHistory();
+      var m=hist[parseInt(val)];
+      if(m){
+        S.prefillPlayers={t1:m.bat1players, t2:m.bat2players};
+        S.phase='setup'; render();
+        showToast('Players loaded — edit names as needed');
+      }
+      break;
+    case 'tab':                   S.activeTab=val; render(); break;
+    case 'undo':                   undoLast(); break;
+    case 'pick-bowler':            pickBowler(parseInt(val)); break;
+    case 'pick-bowler-edit':       S.bowlerIdx=parseInt(val); S.editBowler=false; render(); break;
+    case 'pick-batsman':           pickBatsman(parseInt(val)); break;
+    case 'pick-striker':           pickStriker(parseInt(val)); break;
+    case 'edit-bowler':            S.editBowler=true; render(); break;
+    case 'save-bowler':            saveBowlerName(); break;
+    case 'cancel-edit-bowler':     S.editBowler=false; render(); break;
+    case 'export-pdf':             exportPDF(); break;
+    case 'print-history':          printHistoryMatch(parseInt(val)); break;
+    case 'set-dismissal':          S.dismissalType=val; render(); break;
+    case 'confirm-dismissal':      confirmDismissal(S.dismissalType); break;
+    case 'cancel-dismissal':       S.dismissalPending=false; S.dismissalType=''; render(); break;
+    case 'choose-new-players':
+      (function(){
+        var setup=JSON.parse(decodeURIComponent(val));
+        // Show player input form
+        var t1inp=Array.from({length:11},function(_,i){ return '<input id="t1p'+i+'" placeholder="'+(setup.p1[i]||'Player '+(i+1))+'">'; }).join('');
+        var t2inp=Array.from({length:11},function(_,i){ return '<input id="t2p'+i+'" placeholder="'+(setup.p2[i]||'Player '+(i+1))+'">'; }).join('');
+        document.getElementById('main-content').innerHTML=
+          '<div class="setup-panel"><h3>'+setup.t1+' &mdash; Playing XI</h3><div class="player-inputs">'+t1inp+'</div></div>'+
+          '<div class="setup-panel"><h3>'+setup.t2+' &mdash; Playing XI</h3><div class="player-inputs">'+t2inp+'</div></div>'+
+          '<div class="setup-panel">'+
+            '<button class="btn-primary" data-action="finalize-new-players" data-val="'+val+'">&#127951; Start Match</button>'+
+            '<button class="btn-secondary" style="margin-top:8px" data-action="back-to-choose" data-val="'+val+'">&#8592; Back</button>'+
+          '</div>';
+      })();
+      break;
+    case 'finalize-new-players':
+      (function(){
+        var setup=JSON.parse(decodeURIComponent(val));
+        var p1=[],p2=[];
+        for(var i=0;i<11;i++){
+          var e1=document.getElementById('t1p'+i); p1.push(e1&&e1.value.trim()?e1.value.trim():setup.t1+' P'+(i+1));
+          var e2=document.getElementById('t2p'+i); p2.push(e2&&e2.value.trim()?e2.value.trim():setup.t2+' P'+(i+1));
+        }
+        applyTeamSetup(setup,p1,p2);
+      })();
+      break;
+    case 'choose-prev-players':
+      (function(){
+        var data=JSON.parse(decodeURIComponent(val));
+        var hist=getMatchHistory();
+        var m=hist[data.idx];
+        if(!m) return;
+        var p1=m.bat1players.slice(), p2=m.bat2players.slice();
+        while(p1.length<11) p1.push(data.setup.t1+' P'+(p1.length+1));
+        while(p2.length<11) p2.push(data.setup.t2+' P'+(p2.length+1));
+        var histLabel=m.team1+' vs '+m.team2+' ('+m.date+')';
+        renderBatFirstChoice(data.setup, p1, p2, histLabel);
+      })();
+      break;
+    case 'bat-first-confirm':
+      (function(){
+        var setup=JSON.parse(decodeURIComponent(el.dataset.t1));
+        var p1=JSON.parse(decodeURIComponent(el.dataset.p1));
+        var p2=JSON.parse(decodeURIComponent(el.dataset.p2));
+        var batFirst=el.dataset.batfirst;
+        // Override batFirst in setup
+        setup.batFirst=(batFirst==='t1')?setup.t1:setup.t2;
+        applyTeamSetup(setup,p1,p2);
+        showToast('Match started ✓');
+      })();
+      break;
+    case 'back-to-choose':
+      (function(){
+        var setup=JSON.parse(decodeURIComponent(val));
+        renderChoosePlayers(setup);
+      })();
+      break;
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter') return;
+  var id=document.activeElement?document.activeElement.id:'';
+  if(id==='new-bat-inp')          confirmNewBatsman();
+  else if(id==='bowler-inp')      confirmBowler();
+  else if(id==='striker-edit-inp') saveStrikerName();
+  else if(id==='inp-t1'||id==='inp-t2') return;
+});
+
+
+// ═══════════════════════════════════════════════
+// MATCH HISTORY & SAVE/LOAD (localStorage)
+// ═══════════════════════════════════════════════
 
