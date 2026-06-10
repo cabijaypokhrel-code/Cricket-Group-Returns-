@@ -214,24 +214,20 @@ function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo
 }
 
 function printOverlay(html){
-  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0">'+
-    '<title>Match Report</title></head><body>'+html+
-    '<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script>'+
-    '</body></html>';
-  var w=window.open('', '_blank');
-  if(!w){
-    // Popup blocked — fall back to printing in-place via overlay
-    var el=document.getElementById('print-overlay');
-    if(!el){ el=document.createElement('div'); el.id='print-overlay'; document.body.appendChild(el); }
-    el.innerHTML=html;
-    window.print();
-    setTimeout(function(){ el.innerHTML=''; },1000);
-    return;
+  /* Always show in-app overlay — never window.open (strands mobile users) */
+  var overlay=document.getElementById('pdf-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='pdf-overlay';
+    document.body.appendChild(overlay);
   }
-  w.document.open();
-  w.document.write(doc);
-  w.document.close();
+  overlay.innerHTML=
+    '<div id="pdf-overlay-bar">'+
+      '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\'">&#8592; Back</button>'+
+      '<button id="pdf-print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'+
+    '</div>'+
+    '<div id="pdf-overlay-body">'+html+'</div>';
+  overlay.style.display='block';
 }
 
 function exportPDF(){
