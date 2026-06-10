@@ -2351,7 +2351,7 @@ function toggleDark(){
 function showMilestone(name, runs){
   var icons={25:'🏅',50:'⭐',75:'🔥',100:'💯',150:'🚀',200:'🏆'};
   var label={25:'Quarter Century! 🏅',50:'Half Century! ⭐',75:'75 Up! 🔥',100:'CENTURY! 💯',150:'150 Up! 🚀',200:'Double Hundred! 🏆'};
-  var mil=25; [200,150,100,75,50,25].forEach(function(m){ if(runs>=m) mil=m; });
+  var mil=25; [25,50,75,100,150,200].forEach(function(m){ if(runs>=m) mil=m; });
   var el=document.getElementById('milestone-toast');
   if(!el) return;
   el.innerHTML=(icons[mil]||'⭐')+' '+name+' — '+(label[mil]||runs+'!');
