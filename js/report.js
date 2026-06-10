@@ -251,49 +251,40 @@ function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo
 
 var _pdfHtml='';
 
-/* afterprint: remove the normal-flow print frame */
-window.addEventListener('afterprint', function(){
-  var f=document.getElementById('pdf-print-frame');
-  if(f) f.remove();
-  var s=document.getElementById('pdf-report-styles');
-  if(s) s.remove();
-});
-
 function _doPrint(){
   if(!_pdfHtml) return;
-  /* Inject report CSS into <head> */
-  var styleEl=document.getElementById('pdf-report-styles');
-  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pdf-report-styles'; document.head.appendChild(styleEl); }
+  /* Extract CSS from report HTML */
   var combinedCss='';
   var stripped=_pdfHtml.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi,function(_,css){ combinedCss+=css; return ''; });
-  styleEl.textContent=combinedCss;
-  /* Create a normal block-level div (not fixed) — Chrome prints this reliably */
-  var old=document.getElementById('pdf-print-frame');
-  if(old) old.remove();
-  var frame=document.createElement('div');
-  frame.id='pdf-print-frame';
-  frame.innerHTML=stripped;
-  document.body.appendChild(frame);
-  window.print();
-  /* afterprint listener above will clean up frame + styles */
-  /* fallback cleanup if afterprint never fires (some browsers) */
+  /* Use a hidden iframe with its own document — most reliable cross-browser print method.
+     position:fixed overlay approach silently prints blank on Chrome/Safari mobile. */
+  var iframe=document.createElement('iframe');
+  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+  document.body.appendChild(iframe);
+  var doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>Match Report</title>'+
+    '<style>'+combinedCss+
+    'body{font-family:Arial,sans-serif;font-size:13px;color:#111;margin:20px}'+
+    'svg{max-width:100%}'+
+    '</style></head><body>'+stripped+'</body></html>');
+  doc.close();
+  /* Wait for iframe to render before printing */
   setTimeout(function(){
-    var el=document.getElementById('pdf-print-frame');
-    if(el) el.remove();
-    var s=document.getElementById('pdf-report-styles');
-    if(s) s.remove();
-  }, 3000);
+    try{
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }catch(e){ window.print(); }
+    setTimeout(function(){ if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 2000);
+  }, 400);
 }
 
 function printOverlay(html){
   _pdfHtml=html;
-  /* Hoist styles for the on-screen preview */
-  var styleEl=document.getElementById('pdf-report-styles');
-  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pdf-report-styles'; document.head.appendChild(styleEl); }
-  var combinedCss='';
-  var stripped=html.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi,function(_,css){ combinedCss+=css; return ''; });
-  styleEl.textContent=combinedCss;
-
+  /* Strip style tags for on-screen preview (inject inline so they apply inside the div) */
+  var previewHtml=html;
   var overlay=document.getElementById('pdf-overlay');
   if(!overlay){
     overlay=document.createElement('div');
@@ -305,7 +296,7 @@ function printOverlay(html){
       '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\';_pdfHtml=\'\';">&#8592; Back</button>'+
       '<button id="pdf-print-btn" onclick="_doPrint()">&#128438; Print / Save PDF</button>'+
     '</div>'+
-    '<div id="pdf-overlay-body">'+stripped+'</div>';
+    '<div id="pdf-overlay-body">'+previewHtml+'</div>';
   overlay.style.display='block';
   overlay.scrollTop=0;
 }

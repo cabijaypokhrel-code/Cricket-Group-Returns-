@@ -966,11 +966,37 @@ document.addEventListener('click', function(e){
   if(action==='wizard-prev-players'){
     var phm=getMatchHistory()[parseInt(val)];
     if(phm){
-      S._wizardData.p1=phm.batFirst===phm.team1?phm.inn1batting.map(function(b){return b.name;}):phm.inn1bowling.map(function(b){return b.name;});
-      S._wizardData.p2=phm.batFirst===phm.team1?phm.inn1bowling.map(function(b){return b.name;}):phm.inn1batting.map(function(b){return b.name;});
+      /* Show assignment screen: user picks which old team's players go to each new team */
+      var d=S._wizardData;
+      var oldA=phm.inn1batting.map(function(b){return b.name;});
+      var oldB=phm.inn1bowling.map(function(b){return b.name;});
+      var oldAname=phm.batFirst||phm.team1;
+      var oldBname=phm.batFirst===phm.team1?phm.team2:phm.team1;
+      var encA=encodeURIComponent(JSON.stringify({p1:oldA,p2:oldB}));
+      var encB=encodeURIComponent(JSON.stringify({p1:oldB,p2:oldA}));
+      document.getElementById('main-content').innerHTML=
+        '<div class="setup-panel">'+
+          '<div style="font-size:16px;font-weight:800;color:var(--c-text);margin-bottom:4px">Assign Players</div>'+
+          '<div style="font-size:12px;color:var(--c-text-soft);margin-bottom:18px">Which players go to which team?</div>'+
+          '<button class="btn-primary" style="margin-bottom:10px" data-action="wizard-assign-players" data-val="'+encA+'">'+
+            '<strong>'+d.t1+'</strong> gets '+oldAname+' players<br>'+
+            '<span style="font-size:11px;opacity:.8">'+oldA.slice(0,3).join(', ')+'…</span>'+
+          '</button>'+
+          '<button class="btn-primary" style="margin-bottom:10px;background:#185FA5" data-action="wizard-assign-players" data-val="'+encB+'">'+
+            '<strong>'+d.t1+'</strong> gets '+oldBname+' players<br>'+
+            '<span style="font-size:11px;opacity:.8">'+oldB.slice(0,3).join(', ')+'…</span>'+
+          '</button>'+
+          '<button class="btn-cancel" style="margin-top:4px" data-action="back-to-player-choice">&#8592; Back</button>'+
+        '</div>';
     }
+    return;
+  }
+  if(action==='wizard-assign-players'){
+    var assign=JSON.parse(decodeURIComponent(val));
+    S._wizardData.p1=assign.p1; S._wizardData.p2=assign.p2;
     renderMatchWizard(2); return;
   }
+  if(action==='back-to-player-choice'){ renderPlayerChoice(); return; }
   if(action==='wizard-back1'){ renderMatchWizard(1); return; }
   if(action==='wizard-step3'){
     _wizardCollect2();
