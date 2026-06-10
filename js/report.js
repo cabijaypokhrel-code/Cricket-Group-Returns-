@@ -249,8 +249,27 @@ function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo
     :'');
 }
 
+var _pdfHtml='';
+
+/* Wire up beforeprint/afterprint once so fixed overlay prints correctly */
+window.addEventListener('beforeprint', function(){
+  if(!_pdfHtml) return;
+  document.body.setAttribute('data-printing','1');
+});
+window.addEventListener('afterprint', function(){
+  document.body.removeAttribute('data-printing');
+});
+
 function printOverlay(html){
-  /* Always show in-app overlay — never window.open (strands mobile users) */
+  _pdfHtml=html;
+
+  /* Hoist any <style> blocks out of the html into <head> so they apply on print */
+  var styleEl=document.getElementById('pdf-report-styles');
+  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pdf-report-styles'; document.head.appendChild(styleEl); }
+  var combinedCss='';
+  var stripped=html.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi,function(_,css){ combinedCss+=css; return ''; });
+  styleEl.textContent=combinedCss;
+
   var overlay=document.getElementById('pdf-overlay');
   if(!overlay){
     overlay=document.createElement('div');
@@ -259,11 +278,12 @@ function printOverlay(html){
   }
   overlay.innerHTML=
     '<div id="pdf-overlay-bar">'+
-      '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\'">&#8592; Back</button>'+
+      '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\';_pdfHtml=\'\';">&#8592; Back</button>'+
       '<button id="pdf-print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'+
     '</div>'+
-    '<div id="pdf-overlay-body">'+html+'</div>';
+    '<div id="pdf-overlay-body">'+stripped+'</div>';
   overlay.style.display='block';
+  overlay.scrollTop=0;
 }
 
 function exportPDF(){

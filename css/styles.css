@@ -229,14 +229,16 @@ body.dark{--c-bg:#0f1117;--c-surface:#1a1d27;--c-surface-alt:#222535;--c-border:
 #main-content{padding:16px;background:var(--c-bg);min-height:calc(100vh - 80px)}
 
 /* ================= PDF in-app overlay ================= */
-#pdf-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto}
+#pdf-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #pdf-overlay-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid #ddd;gap:10px}
 #pdf-close-btn{background:none;border:1.5px solid #bbb;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;color:#333;min-height:44px}
 #pdf-print-btn{background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px}
-#pdf-overlay-body{padding:16px}
+#pdf-overlay-body{padding:16px;font-family:Arial,sans-serif;font-size:13px;color:#111}
 @media print{
-  #pdf-overlay-bar{display:none}
+  /* Hide everything except the overlay content */
   body>*:not(#pdf-overlay){display:none!important}
-  #pdf-overlay{display:block!important;position:static;overflow:visible}
+  /* Override fixed positioning so content flows normally on the page */
+  #pdf-overlay{display:block!important;position:static!important;overflow:visible!important;height:auto!important;z-index:auto!important}
+  #pdf-overlay-bar{display:none!important}
   #pdf-overlay-body{padding:0}
 }
