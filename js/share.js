@@ -1,4 +1,12 @@
 // ── LIVE SHARE VIA URL ────────────────────────────────────────────────
+// STUN + free TURN relay so phones on 4G/carrier NAT can connect.
+var PEER_OPTS={debug:0,config:{iceServers:[
+  {urls:'stun:stun.l.google.com:19302'},
+  {urls:'stun:stun1.l.google.com:19302'},
+  {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}
+]}};
 function encodeShareState(){
   function pb(arr){ return arr.map(function(b){ return [b.name,b.runs,b.balls,b.fours,b.sixes,b.out?1:0,b.howOut||'',b.retiredHurt?1:0]; }); }
   function pw(arr){ return arr.filter(function(b){return b.balls>0;}).map(function(b){ return [b.name,b.balls,b.runs,b.wickets]; }); }
@@ -69,7 +77,7 @@ function startLiveRoom(){
   _loadPeerJS(function(){
     var code=_roomCode();
     try{
-      var peer=new Peer(code,{debug:0});
+      var peer=new Peer(code,PEER_OPTS);
       peer.on('open',function(id){
         LIVE.peer=peer; LIVE.code=id; LIVE.hosting=true;
         _setLiveBtn('📡 Room: '+id);
@@ -130,9 +138,18 @@ function joinFromInput(){
 }
 
 function joinLiveRoom(code){
+  function retry(label){
+    _updateLiveDot(label+' — retrying…');
+    try{ if(LIVE.peer){ LIVE.peer.destroy(); LIVE.peer=null; } }catch(e){}
+    clearTimeout(LIVE._retryTimer);
+    LIVE._retryTimer=setTimeout(function(){
+      // Stop retrying if user navigated away from the join screen
+      if(document.getElementById('live-dot')) joinLiveRoom(code);
+    },5000);
+  }
   _loadPeerJS(function(){
     try{
-      var peer=new Peer({debug:0});
+      var peer=new Peer(PEER_OPTS);
       LIVE.peer=peer;
       peer.on('open',function(){
         var conn=peer.connect(code,{reliable:true,serialization:'raw'});
@@ -144,11 +161,11 @@ function joinLiveRoom(code){
             if(d&&d.v) renderSharedView(d,true);
           }catch(e){}
         });
-        conn.on('close',function(){ _updateLiveDot('⚪ Scorer offline'); });
-        conn.on('error',function(){ _updateLiveDot('⚪ Cannot connect'); });
+        conn.on('close',function(){ retry('⚪ Scorer offline'); });
+        conn.on('error',function(){ retry('⚪ Cannot connect'); });
       });
-      peer.on('error',function(){ _updateLiveDot('⚪ Cannot connect'); });
-    }catch(e){ _updateLiveDot('⚪ Cannot connect'); }
+      peer.on('error',function(){ retry('⚪ Cannot connect'); });
+    }catch(e){ retry('⚪ Cannot connect'); }
   });
 }
 
