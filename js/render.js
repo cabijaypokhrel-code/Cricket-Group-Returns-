@@ -31,46 +31,34 @@ function renderSetup(){
   var hasSaved = hasSavedProgress();
   var history  = getMatchHistory();
   document.getElementById('main-content').innerHTML=
-    '<div style="padding:20px 0 8px">'+
-
-    /* Hero */
-    '<div style="text-align:center;padding:28px 20px 20px">'+
-      '<div style="font-size:56px;line-height:1;margin-bottom:12px">🏏</div>'+
-      '<div style="font-size:22px;font-weight:800;color:var(--c-text);letter-spacing:-.02em">Saturday Cricket</div>'+
-      '<div style="font-size:13px;color:var(--c-text-soft);margin-top:4px">Score. Share. Celebrate.</div>'+
+    '<div class="home-hero">'+
+      '<div class="home-hero-icon">🏏</div>'+
+      '<div class="home-hero-title">Saturday Cricket</div>'+
+      '<div class="home-hero-sub">Score. Share. Celebrate.</div>'+
     '</div>'+
 
-    /* Primary actions */
-    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
-      '<button class="btn-primary" style="font-size:17px;padding:18px;letter-spacing:-.01em" data-action="new-match-wizard">'+
-        '&#127951; New Match'+
-      '</button>'+
+    '<div class="home-actions">'+
+      '<button class="btn-primary" data-action="new-match-wizard">&#127951; New Match</button>'+
       (hasSaved?
-        '<button class="btn-secondary" style="border-color:var(--c-primary);color:var(--c-primary)" data-action="load-progress">'+
-          '&#9654;&#65039; Continue Saved Match'+
-        '</button>'
+        '<button class="btn-secondary" style="border-color:var(--c-primary);color:var(--c-primary)" data-action="load-progress">&#9654;&#65039; Continue Saved Match</button>'
       :'')+
-      '<button class="btn-secondary" data-action="show-history">'+
-        '&#128202; Match History'+(history.length?' <span style="background:var(--c-primary);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px">'+history.length+'</span>':'')+
+      '<button class="btn-secondary" data-action="show-history">&#128202; Match History'+(history.length?' <span style="background:var(--c-primary);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px">'+history.length+'</span>':'')+
       '</button>'+
     '</div>'+
 
-    /* Join live */
-    '<div style="margin:0 16px 16px;border:1.5px solid var(--c-border);border-radius:var(--radius-lg);overflow:hidden">'+
-      '<div style="background:var(--c-blue-soft);padding:12px 14px;display:flex;align-items:center;gap:8px">'+
-        '<span style="font-size:20px">📡</span>'+
-        '<span style="font-size:13.5px;font-weight:700;color:#1d4fb0">Join a Live Match</span>'+
+    '<div class="join-card">'+
+      '<div class="join-card-header">'+
+        '<span class="join-card-header-icon">📡</span>'+
+        '<span class="join-card-header-label">Join a Live Match</span>'+
       '</div>'+
-      '<div style="padding:12px 14px;background:var(--c-surface)">'+
-        '<div style="font-size:12px;color:var(--c-text-soft);margin-bottom:8px">Enter the 6-character room code from the scorer</div>'+
-        '<div style="display:flex;gap:8px">'+
+      '<div class="join-card-body">'+
+        '<div class="join-card-hint">Enter the 6-character room code from the scorer</div>'+
+        '<div class="join-input-row">'+
           '<input id="inp-join-code" class="modal-input" style="margin:0;flex:1;text-transform:uppercase;letter-spacing:3px;font-weight:700;text-align:center;font-size:18px" maxlength="6" placeholder="ABC123" autocomplete="off">'+
           '<button class="btn-primary" style="width:auto;padding:10px 20px;margin:0;font-size:14px" data-action="join-live">Join</button>'+
         '</div>'+
         '<div id="join-err" style="font-size:12px;color:#c0392b;margin-top:6px;display:none">Enter the 6-character code (letters and numbers).</div>'+
       '</div>'+
-    '</div>'+
-
     '</div>';
 }
 
@@ -85,6 +73,7 @@ function renderMatchWizard(step){
     var d = S._wizardData || {};
     mc.innerHTML=
       '<div class="setup-panel">'+
+        _wizardProgress(1)+
         _wizardHeader('Match Setup','Step 1 of 3 — Teams & Toss')+
         '<div class="form-group"><label>Team 1 Name</label><input id="inp-t1" placeholder="e.g. Kathmandu XI" value="'+(d.t1||'')+'"></div>'+
         '<div class="form-group"><label>Team 2 Name</label><input id="inp-t2" placeholder="e.g. Bhaktapur CC" value="'+(d.t2||'')+'"></div>'+
@@ -118,6 +107,7 @@ function renderMatchWizard(step){
     var prefill=d.p1||Array(11).fill('');
     mc.innerHTML=
       '<div class="setup-panel">'+
+        _wizardProgress(2)+
         _wizardHeader(d.t1+' — Playing XI','Step 2 of 3 — '+d.t1+' players')+
         '<div class="player-inputs">'+
           Array.from({length:11},function(_,i){
@@ -136,6 +126,7 @@ function renderMatchWizard(step){
     var prefill=d.p2||Array(11).fill('');
     mc.innerHTML=
       '<div class="setup-panel">'+
+        _wizardProgress(3)+
         _wizardHeader(d.t2+' — Playing XI','Step 3 of 3 — '+d.t2+' players')+
         '<div class="player-inputs">'+
           Array.from({length:11},function(_,i){
@@ -166,9 +157,18 @@ function renderPlayerChoice(){
 }
 
 function _wizardHeader(title, sub){
-  return '<div style="margin-bottom:18px">'+
-    '<div style="font-size:18px;font-weight:800;color:var(--c-text)">'+title+'</div>'+
-    '<div style="font-size:12px;color:var(--c-primary);font-weight:600;margin-top:2px">'+sub+'</div>'+
+  return '<div class="wizard-header">'+
+    '<div class="wizard-title">'+title+'</div>'+
+    '<div class="wizard-sub">'+sub+'</div>'+
+  '</div>';
+}
+
+function _wizardProgress(step){
+  return '<div class="wizard-progress">'+
+    [1,2,3].map(function(s){
+      var cls='wizard-step'+(s===step?' active':s<step?' done':'');
+      return '<div class="'+cls+'"></div>';
+    }).join('')+
   '</div>';
 }
 
@@ -246,13 +246,16 @@ function renderScoring(){
 
   var html=
     '<div class="scoreboard">'+
-      '<div class="team-names"><span class="team-name"><img src="'+TEAM_LOGO+'" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">'+battingTeam+' &#127951;</span><span style="font-size:13px;color:#888">Inn.'+S.innings+'</span></div>'+
+      '<div class="scoreboard-top">'+
+        '<div class="scoreboard-team"><img src="'+TEAM_LOGO+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">'+battingTeam+' &#127951;</div>'+
+        '<div class="scoreboard-innings-badge">Inn. '+S.innings+'</div>'+
+      '</div>'+
       '<div class="score-main">'+
         '<div class="score-runs">'+s.runs+'/'+s.wickets+'</div>'+
-        '<div class="score-info"><div class="score-overs">'+overs(s)+' overs</div><div class="score-rr">RR: '+rr(s)+'</div></div>'+
+        '<div class="score-detail"><div class="score-overs">'+overs(s)+' overs</div><div class="score-rr">RR: '+rr(s)+'</div></div>'+
       '</div>'+
       targetBar+
-      '<div class="this-over"><div class="over-label">This over</div><div class="balls-row">'+ballsHtml+'</div></div>'+
+      '<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+ballsHtml+'</div></div>'+
     '</div>';
 
   if(S.confirmEndInnings){
@@ -479,7 +482,7 @@ function renderScoring(){
     html+=
       '<div class="scoring-panel">'+
         '<div class="batters-row">'+
-          '<div class="batter-card striker">'+strikerContent+'</div>'+
+          '<div class="batter-card batter-striker">'+strikerContent+'</div>'+
           '<div class="batter-card" data-action="swap-batters">'+
             '<div class="batter-name">'+ns().name+'</div>'+
             '<div class="batter-score">'+ns().runs+' ('+ns().balls+'b) '+ns().fours+'&times;4 '+ns().sixes+'&times;6</div>'+
@@ -526,29 +529,29 @@ function renderScoring(){
             '<button style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px" data-action="edit-bowler" title="Edit bowler name">&#9999;&#65039;</button>'+
           '</div>'
         )+
-        '<div class="btn-grid">'+
-          '<button class="btn" data-action="runs" data-val="0">0</button>'+
-          '<button class="btn" data-action="runs" data-val="1">1</button>'+
-          '<button class="btn" data-action="runs" data-val="2">2</button>'+
-          '<button class="btn" data-action="runs" data-val="3">3</button>'+
-          '<button class="btn btn-4" data-action="runs" data-val="4">4</button>'+
-          '<button class="btn btn-6" data-action="runs" data-val="6">6</button>'+
-          '<button class="btn btn-W" data-action="wicket" style="font-size:11px;font-weight:800;color:#791F1F;letter-spacing:.5px">WICKET</button>'+
-          '<button class="btn btn-wd" data-action="open-extras" data-val="WD">Wide</button>'+
+        '<div class="run-grid">'+
+          '<button class="run-btn" data-action="runs" data-val="0">0</button>'+
+          '<button class="run-btn" data-action="runs" data-val="1">1</button>'+
+          '<button class="run-btn" data-action="runs" data-val="2">2</button>'+
+          '<button class="run-btn" data-action="runs" data-val="3">3</button>'+
+          '<button class="run-btn run-btn--four" data-action="runs" data-val="4">4</button>'+
+          '<button class="run-btn run-btn--six" data-action="runs" data-val="6">6</button>'+
+          '<button class="run-btn wicket-btn" data-action="wicket">WICKET</button>'+
+          '<button class="run-btn run-btn--wide" data-action="open-extras" data-val="WD">Wide</button>'+
         '</div>'+
         '<div class="extras-row">'+
-          '<button class="btn btn-nb" data-action="open-extras" data-val="NB">No Ball</button>'+
-          '<button class="btn" style="background:#F0F7FF;color:#185FA5;border-color:#B5D4F4;font-size:12px" data-action="open-extras" data-val="BYE">Byes</button>'+
-          '<button class="btn" style="background:#F5F0FF;color:#4A2FA5;border-color:#C4B5F4;font-size:12px" data-action="open-extras" data-val="LB">Leg Byes</button>'+
+          '<button class="extras-btn extras-btn--nb" data-action="open-extras" data-val="NB">No Ball</button>'+
+          '<button class="extras-btn extras-btn--bye" data-action="open-extras" data-val="BYE">Byes</button>'+
+          '<button class="extras-btn extras-btn--lb" data-action="open-extras" data-val="LB">Leg Byes</button>'+
         '</div>'+
         '<div class="action-row">'+
           '<button class="btn-undo" data-action="undo" '+(S.snapshots.length===0?'disabled':'')+'>&#8630; Undo</button>'+
           '<button class="btn" style="flex:1;font-size:12px;padding:10px 2px" data-action="save-progress">&#128190; Save</button>'+
           '<button class="btn btn-danger" style="flex:1;font-size:12px;padding:10px 2px" data-action="end-innings">End Inn.</button>'+
         '</div>'+
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
-          '<button class="btn" style="background:var(--c-blue-soft);color:#1d4fb0;border-color:#c7d8fb;font-size:12px;font-weight:700;padding:10px 4px" data-action="share-match">&#128225; Share</button>'+
-          '<button class="btn" style="background:var(--c-amber-soft);color:var(--c-amber);border-color:#f5dca0;font-size:12px;font-weight:700;padding:10px 4px" data-action="export-pdf">&#128438; Export PDF</button>'+
+        '<div class="share-row">'+
+          '<button class="btn" style="background:var(--c-runs-soft);color:#1e40af;border-color:#bfdbfe;font-size:12px;font-weight:700" data-action="share-match">&#128225; Share</button>'+
+          '<button class="btn" style="background:var(--c-extras-soft);color:var(--c-extras);border-color:#fde68a;font-size:12px;font-weight:700" data-action="export-pdf">&#128438; Export PDF</button>'+
         '</div>'+
         (function(){
           var dotCnt=0,fourCnt=0,sixCnt=0,extraCnt=0,runsCnt=0;
@@ -801,7 +804,7 @@ function renderScoring(){
         var wkts=ov.filter(function(b){return b==='W';}).length;
         html+='<div class="over-entry">'+
           '<span style="font-size:11px;font-weight:700;color:#aaa;min-width:36px">Ov '+(i+1)+'</span>'+
-          '<div class="balls-row" style="flex:1">'+ov.map(function(b){ return '<div class="ball ball-'+ballClass(b)+'" style="width:28px;height:28px;font-size:10px">'+b+'</div>'; }).join('')+'</div>'+
+          '<div class="over-balls" style="flex:1">'+ov.map(function(b){ return '<div class="ball ball-'+ballClass(b)+'" style="width:28px;height:28px;font-size:10px">'+b+'</div>'; }).join('')+'</div>'+
           '<span style="font-size:12px;font-weight:700;color:#333;min-width:28px;text-align:right">'+runsInOv+'r'+(wkts?' <span style="color:#791F1F">'+wkts+'w</span>':'')+'</span>'+
           (bowlerName?'<span style="font-size:10px;color:#aaa;margin-left:4px">'+bowlerName+'</span>':'')+
         '</div>';
@@ -820,16 +823,16 @@ function renderInn1Complete(){
   var topBat=S.inn1batting.slice().sort(function(a,b){return b.runs-a.runs;})[0];
   var topBowl=S.inn1bowling.filter(function(b){return b.wickets>0;}).sort(function(a,b){return b.wickets-a.wickets||a.runs-b.runs;})[0];
   document.getElementById('main-content').innerHTML=
-    '<div class="setup-panel" style="text-align:center">'+
-      '<div style="font-size:42px;margin-bottom:8px">&#127951;</div>'+
-      '<div style="font-size:20px;font-weight:800;color:var(--c-text);margin-bottom:4px">1st Innings Complete</div>'+
-      '<div style="font-size:28px;font-weight:900;color:var(--c-primary);margin:12px 0">'+s.runs+'/'+s.wickets+'</div>'+
-      '<div style="font-size:13px;color:var(--c-text-soft);margin-bottom:4px">'+Math.floor(s.balls/6)+'.'+s.balls%6+' ov &nbsp;·&nbsp; RR: '+(s.balls>0?(s.runs/(s.balls/6)).toFixed(2):'0.00')+'</div>'+
-      (topBat?'<div style="font-size:13px;margin-bottom:4px">&#11088; '+topBat.name+' — '+topBat.runs+' ('+topBat.balls+'b)</div>':'')+
-      (topBowl?'<div style="font-size:13px;margin-bottom:16px">&#127992; '+topBowl.name+' — '+topBowl.wickets+'/'+(topBowl.runs)+'</div>':'')+
-      '<div style="background:var(--c-blue-soft);border-radius:var(--radius-md);padding:14px;margin-bottom:16px">'+
-        '<div style="font-size:13px;color:#1d4fb0;font-weight:600">'+bw+' need <strong>'+(s.runs+1)+'</strong> to win</div>'+
-        '<div style="font-size:12px;color:#4b72c0;margin-top:2px">in '+S.match.overs+' overs</div>'+
+    '<div class="innings-complete">'+
+      '<div class="innings-complete-icon">&#127951;</div>'+
+      '<div class="innings-complete-title">1st Innings Complete</div>'+
+      '<div class="innings-complete-score">'+s.runs+'/'+s.wickets+'</div>'+
+      '<div class="innings-complete-meta">'+Math.floor(s.balls/6)+'.'+s.balls%6+' ov &nbsp;·&nbsp; RR: '+(s.balls>0?(s.runs/(s.balls/6)).toFixed(2):'0.00')+'</div>'+
+      (topBat?'<div class="innings-complete-meta">&#11088; '+topBat.name+' — '+topBat.runs+' ('+topBat.balls+'b)</div>':'')+
+      (topBowl?'<div class="innings-complete-meta" style="margin-bottom:0">&#127992; '+topBowl.name+' — '+topBowl.wickets+'/'+(topBowl.runs)+'</div>':'')+
+      '<div class="innings-target-box">'+
+        '<div class="innings-target-label">'+bw+' need <strong>'+(s.runs+1)+'</strong> to win</div>'+
+        '<div class="innings-target-overs">in '+S.match.overs+' overs</div>'+
       '</div>'+
       '<button class="btn-primary" data-action="start-inn2">&#127951; Start 2nd Innings</button>'+
     '</div>';
@@ -877,22 +880,22 @@ function renderResult(){
     '</table>';
   }
   var html=
-    '<div class="card" style="border-top:4px solid var(--c-primary)">'+
-      '<div style="text-align:center;padding:8px 0 14px">'+
-        '<div style="font-size:36px;margin-bottom:6px">&#127942;</div>'+
-        '<div style="font-size:18px;font-weight:800;color:var(--c-text)">'+result+'</div>'+
-        '<div style="font-size:12px;color:var(--c-text-soft);margin-top:4px">'+S.match.team1+' vs '+S.match.team2+' &nbsp;·&nbsp; '+S.match.overs+' overs</div>'+
+    '<div class="result-screen">'+
+      '<div class="result-winner">'+
+        '<div class="result-trophy">&#127942;</div>'+
+        '<div class="result-text">'+result+'</div>'+
+        '<div class="result-meta">'+S.match.team1+' vs '+S.match.team2+' &nbsp;·&nbsp; '+S.match.overs+' overs</div>'+
       '</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">'+
-        '<div style="text-align:center;background:var(--c-surface-alt);border-radius:var(--radius-md);padding:10px">'+
-          '<div style="font-size:11px;font-weight:600;color:var(--c-text-soft)">'+bt+'</div>'+
-          '<div style="font-size:24px;font-weight:900;color:var(--c-primary)">'+s1.runs+'/'+s1.wickets+'</div>'+
-          '<div style="font-size:11px;color:var(--c-text-faint)">'+Math.floor(s1.balls/6)+'.'+s1.balls%6+' ov</div>'+
+      '<div class="result-score-grid">'+
+        '<div class="result-score-block">'+
+          '<div class="result-score-team">'+bt+'</div>'+
+          '<div class="result-score-runs">'+s1.runs+'/'+s1.wickets+'</div>'+
+          '<div class="result-score-overs">'+Math.floor(s1.balls/6)+'.'+s1.balls%6+' ov</div>'+
         '</div>'+
-        '<div style="text-align:center;background:var(--c-surface-alt);border-radius:var(--radius-md);padding:10px">'+
-          '<div style="font-size:11px;font-weight:600;color:var(--c-text-soft)">'+bw+'</div>'+
-          '<div style="font-size:24px;font-weight:900;color:var(--c-primary)">'+s2.runs+'/'+s2.wickets+'</div>'+
-          '<div style="font-size:11px;color:var(--c-text-faint)">'+Math.floor(s2.balls/6)+'.'+s2.balls%6+' ov</div>'+
+        '<div class="result-score-block">'+
+          '<div class="result-score-team">'+bw+'</div>'+
+          '<div class="result-score-runs">'+s2.runs+'/'+s2.wickets+'</div>'+
+          '<div class="result-score-overs">'+Math.floor(s2.balls/6)+'.'+s2.balls%6+' ov</div>'+
         '</div>'+
       '</div>'+
     '</div>'+
