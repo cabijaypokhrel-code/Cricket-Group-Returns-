@@ -77,53 +77,89 @@ function buildAnalysisHTML(matchObj, s1, s2, oh1, oh2, fow1, fow2){
       '</svg></div>';
   }
 
-  /* SVG line graph: cumulative runs chase */
+  /* SVG worm chart: cumulative runs — professional style */
   function lineChart(){
     if(!cum1.length&&!cum2.length) return '';
-    var W=320, H=150, pad={t:12,r:12,b:30,l:32};
+    var W=340, H=220, pad={t:44,r:20,b:42,l:42};
     var innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
-    var maxR=Math.max.apply(null,[s1.runs,s2.runs,target,1])+5;
+    var maxR=Math.max.apply(null,[s1.runs,s2.runs,1]);
+    /* round up to nearest 50 */
+    maxR=Math.ceil((maxR+20)/50)*50;
     var n=totalOvers;
-    function px(i){ return (pad.l+((i)/n)*innerW).toFixed(1); }
-    function py(r){ return (pad.t+innerH-(r/maxR)*innerH).toFixed(1); }
+    function px(i){ return (pad.l+(i/n)*innerW).toFixed(2); }
+    function py(r){ return (pad.t+innerH-(r/maxR)*innerH).toFixed(2); }
 
-    /* target line */
-    var tPath='M'+px(0)+','+py(0)+' L'+px(n)+','+py(s1.runs);
-    /* inn1 cumulative */
-    var path1=cum1.map(function(r,i){ return (i===0?'M':'L')+px(i+1)+','+py(r); }).join(' ');
-    /* inn2 cumulative */
-    var path2=cum2.map(function(r,i){ return (i===0?'M':'L')+px(i+1)+','+py(r); }).join(' ');
-    /* FOW dots */
-    function fowDots(fow, cum){
+    /* dashed grid lines + y-axis labels */
+    var grid='', yStep=maxR<=100?25:maxR<=200?50:100;
+    for(var v=0;v<=maxR;v+=yStep){
+      var yy=py(v);
+      grid+='<line x1="'+pad.l+'" y1="'+yy+'" x2="'+(W-pad.r)+'" y2="'+yy+
+        '" stroke="#d9d9d9" stroke-width="0.8" stroke-dasharray="4,3"/>'+
+        '<text x="'+(pad.l-6)+'" y="'+(parseFloat(yy)+4)+
+        '" text-anchor="end" font-size="9" fill="#666">'+v+'</text>';
+    }
+
+    /* x-axis tick labels */
+    var xStep=n<=10?2:n<=20?5:10;
+    var xLabels='';
+    for(var o=0;o<=n;o+=xStep){
+      xLabels+='<text x="'+px(o)+'" y="'+(H-pad.b+13)+
+        '" text-anchor="middle" font-size="9" fill="#666">'+o+'</text>';
+    }
+
+    /* axis border */
+    var axes='<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+
+      '" stroke="#bbb" stroke-width="1"/>'+
+      '<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+
+      '" stroke="#bbb" stroke-width="1"/>';
+
+    /* axis titles */
+    var axisTitles=
+      '<text x="'+(pad.l-30)+'" y="'+(pad.t+innerH/2)+
+        '" text-anchor="middle" font-size="9" font-weight="700" fill="#555" '+
+        'transform="rotate(-90,'+(pad.l-30)+','+(pad.t+innerH/2)+')">RUNS</text>'+
+      '<text x="'+(pad.l+innerW/2)+'" y="'+(H-2)+
+        '" text-anchor="middle" font-size="9" font-weight="700" fill="#555">OVERS</text>';
+
+    /* line path helper — start from 0,0 */
+    function makePath(cum, color, strokeW){
+      if(!cum.length) return '';
+      var d='M'+px(0)+','+py(0);
+      cum.forEach(function(r,i){ d+=' L'+px(i+1)+','+py(r); });
+      return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+strokeW+
+        '" stroke-linejoin="round" stroke-linecap="round"/>';
+    }
+
+    /* hollow circles at each wicket — sit on the line */
+    function fowCircles(fow, cum, color){
       return (fow||[]).map(function(f){
-        var ov=Math.ceil(parseFloat(f.over)||0);
-        var r=cum[Math.min(ov,cum.length)-1]||0;
-        return '<circle cx="'+px(ov)+'" cy="'+py(r)+'" r="3.5" fill="#e53935"><title>W'+f.wkts+': '+f.name+' '+f.score+'/'+f.wkts+'</title></circle>';
+        var ov=Math.min(Math.ceil(parseFloat(f.over)||1), cum.length);
+        var r=cum[ov-1]||0;
+        return '<circle cx="'+px(ov)+'" cy="'+py(r)+'" r="5" fill="#fff" stroke="'+color+
+          '" stroke-width="2"><title>'+f.name+' '+f.score+'/'+f.wkts+' (ov '+f.over+')</title></circle>';
       }).join('');
     }
-    /* y-axis */
-    var yLabels='';
-    for(var v=0;v<=maxR;v+=Math.round(maxR/5/10)*10||10){
-      var yy=py(v);
-      yLabels+='<line x1="'+pad.l+'" y1="'+yy+'" x2="'+(W-pad.r)+'" y2="'+yy+'" stroke="#eee" stroke-width="0.5"/>'+
-        '<text x="'+(pad.l-3)+'" y="'+(parseFloat(yy)+3)+'" text-anchor="end" font-size="8" fill="#888">'+v+'</text>';
-    }
-    /* x-axis */
-    var xLabels='';
-    for(var o=0;o<=n;o+=5){
-      xLabels+='<text x="'+px(o)+'" y="'+(H-pad.b+12)+'" text-anchor="middle" font-size="8" fill="#888">'+o+'</text>';
-    }
-    return '<div style="margin-top:10px"><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:2px">Run Chase — Cumulative Runs</div>'+
-      '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:400px;display:block">'+
-        yLabels+xLabels+
-        (cum1.length?'<path d="'+path1+'" fill="none" stroke="#0F6E56" stroke-width="2"/>'+fowDots(fow1,cum1):'')+
-        (cum2.length?'<path d="'+path2+'" fill="none" stroke="#185FA5" stroke-width="2"/>'+fowDots(fow2,cum2):'')+
-        '<path d="'+tPath+'" fill="none" stroke="#e53935" stroke-width="1" stroke-dasharray="5,3"/>'+
-        '<rect x="'+pad.l+'" y="'+pad.t+'" width="'+innerW+'" height="'+innerH+'" fill="none" stroke="#ddd" stroke-width="0.5"/>'+
-        '<text x="'+(pad.l+4)+'" y="'+(pad.t+9)+'" font-size="7" fill="#0F6E56">— '+bat1+'</text>'+
-        (cum2.length?'<text x="'+(pad.l+60)+'" y="'+(pad.t+9)+'" font-size="7" fill="#185FA5">— '+bat2+'</text>':'')+
-        '<text x="'+(pad.l+120)+'" y="'+(pad.t+9)+'" font-size="7" fill="#e53935">-- Target</text>'+
-        '<text x="'+(pad.l+4)+'" y="'+(pad.t+18)+'" font-size="7" fill="#e53935">● Wicket</text>'+
+
+    var c1='#1a2e44', c2='#29aae2';
+
+    /* legend at top */
+    var legend=
+      '<circle cx="'+(pad.l+8)+'" cy="'+(pad.t-22)+'" r="6" fill="'+c1+'"/>'+
+      '<text x="'+(pad.l+18)+'" y="'+(pad.t-18)+'" font-size="10" font-weight="700" fill="'+c1+'">'+bat1.toUpperCase()+'</text>'+
+      (cum2.length?
+        '<circle cx="'+(pad.l+90)+'" cy="'+(pad.t-22)+'" r="6" fill="'+c2+'"/>'+
+        '<text x="'+(pad.l+100)+'" y="'+(pad.t-18)+'" font-size="10" font-weight="700" fill="'+c2+'">'+bat2.toUpperCase()+'</text>'
+      :'')+
+      '<text x="'+(W-pad.r)+'" y="'+(pad.t-18)+'" text-anchor="end" font-size="9" fill="#aaa">○ wicket</text>';
+
+    return '<div style="margin-top:10px;background:#fff;border-radius:8px;padding:12px 8px;border:1px solid #e8e8e8">'+
+      '<div style="font-size:13px;font-weight:800;color:#222;margin-bottom:6px">Worm</div>'+
+      '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:420px;display:block">'+
+        grid+axes+axisTitles+xLabels+legend+
+        makePath(cum1,c1,2.5)+
+        (cum2.length?makePath(cum2,c2,2.5):'')+
+        fowCircles(fow1,cum1,c1)+
+        (cum2.length?fowCircles(fow2,cum2,c2):'')+
       '</svg></div>';
   }
 
