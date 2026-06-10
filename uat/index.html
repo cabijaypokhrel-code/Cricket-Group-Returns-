@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saturday Cricket Team </title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0F6E56">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cricket">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/styles.css?v=13">
+</head>
+<body>
+<div class="ca-credit">&#9733; CA Bijay Pokhrel</div>
+<div class="app">
+  <div class="header" style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <h1 id="match-title" style="display:flex;align-items:center;gap:10px"><img id="header-logo" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;display:none">🏏 Saturday Cricket Team </h1>
+      <p id="match-subtitle">Set up a new match to begin</p>
+    </div>
+    <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙 Dark</button>
+  </div>
+  <div id="milestone-toast"></div>
+  <div id="main-content"></div>
+</div>
+
+<script src="js/logo.js?v=13"></script>
+<script src="js/images.js?v=13"></script>
+<script src="js/state.js?v=13"></script>
+<script src="js/scoring.js?v=13"></script>
+<script src="js/report.js?v=13"></script>
+<script src="js/setup.js?v=13"></script>
+<script src="js/share.js?v=13"></script>
+<script src="js/render.js?v=13"></script>
+<script src="js/storage.js?v=13"></script>
+<script src="js/ui.js?v=13"></script>
+<script src="js/history.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>
