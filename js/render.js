@@ -398,6 +398,7 @@ function renderScoring(){
         '<button class="btn" style="flex:1;font-size:12px;padding:10px 2px" data-action="save-progress">&#128190; Save</button>'+
         '<button class="btn btn-danger" style="flex:1;font-size:12px;padding:10px 2px" data-action="end-innings">End Inn.</button>'+
         '</div>'+
+        '<button class="btn" style="width:100%;background:var(--c-blue-soft);color:#1d4fb0;border-color:#c7d8fb;font-size:13px;font-weight:700;padding:12px 4px;margin-bottom:10px" data-action="share-match">&#128225; Share Live Score</button>'+
         (function(){
           var dotCnt=0,fourCnt=0,sixCnt=0,extraCnt=0,runsCnt=0;
           S.thisBalls.forEach(function(b){
@@ -940,6 +941,7 @@ function renderResult(){
 
     // ── Actions ──
     '<button class="btn-export" data-action="export-pdf" style="margin-bottom:8px">&#128438; Export Match Report (PDF)</button>'+
+    '<button class="btn-export" data-action="share-match" style="margin-bottom:8px;background:var(--c-primary)">&#128225; Share Result</button>'+
     '<button class="btn-secondary" data-action="new-match">&#128260; New Match</button>';
 }
 
@@ -977,6 +979,7 @@ document.addEventListener('click', function(e){
     case 'show-history':          S.phase='history'; renderHistory(); break;
     case 'back-to-setup':         S.phase='setup'; render(); break;
     case 'save-progress':         saveProgress(); break;
+    case 'share-match':           shareMatch(); break;
     case 'load-progress':         loadProgress(); break;
     case 'clear-progress':        clearProgress(); renderHistory(); break;
     case 'use-players':
