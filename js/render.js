@@ -149,6 +149,22 @@ function renderMatchWizard(step){
   }
 }
 
+/* After step 1: choose new players or reuse a previous match's XI */
+function renderPlayerChoice(){
+  var d=S._wizardData||{};
+  var history=getMatchHistory();
+  var html='<div class="setup-panel">'+
+    _wizardHeader(d.t1+' vs '+d.t2, d.overs+' overs — '+d.batFirst+' bat first')+
+    '<div style="font-size:15px;font-weight:700;color:var(--c-text);margin-bottom:14px;text-align:center">Choose Players</div>'+
+    '<button class="btn-primary" style="margin-bottom:10px" data-action="wizard-new-players">&#128101; Enter New Players</button>';
+  history.forEach(function(m,idx){
+    html+='<button class="btn-secondary" style="margin-bottom:8px" data-action="wizard-prev-players" data-val="'+idx+'">'+
+      '&#128257; Use Players from: '+m.team1+' vs '+m.team2+' ('+m.date+')</button>';
+  });
+  html+='<button class="btn-cancel" style="margin-top:8px" data-action="wizard-back1">&#8592; Back</button></div>';
+  document.getElementById('main-content').innerHTML=html;
+}
+
 function _wizardHeader(title, sub){
   return '<div style="margin-bottom:18px">'+
     '<div style="font-size:18px;font-weight:800;color:var(--c-text)">'+title+'</div>'+
@@ -934,6 +950,19 @@ document.addEventListener('click', function(e){
   if(action==='back-to-home'){ S.phase='setup'; render(); return; }
   if(action==='wizard-step2'){
     if(!_wizardCollect1()) return;
+    if(getMatchHistory().length>0){ renderPlayerChoice(); return; }
+    renderMatchWizard(2); return;
+  }
+  if(action==='wizard-new-players'){
+    S._wizardData.p1=Array(11).fill(''); S._wizardData.p2=Array(11).fill('');
+    renderMatchWizard(2); return;
+  }
+  if(action==='wizard-prev-players'){
+    var phm=getMatchHistory()[parseInt(val)];
+    if(phm){
+      S._wizardData.p1=phm.batFirst===phm.team1?phm.inn1batting.map(function(b){return b.name;}):phm.inn1bowling.map(function(b){return b.name;});
+      S._wizardData.p2=phm.batFirst===phm.team1?phm.inn1bowling.map(function(b){return b.name;}):phm.inn1batting.map(function(b){return b.name;});
+    }
     renderMatchWizard(2); return;
   }
   if(action==='wizard-back1'){ renderMatchWizard(1); return; }
@@ -948,7 +977,7 @@ document.addEventListener('click', function(e){
     var t1=d.t1, t2=d.t2;
     var p1=d.p1.map(function(n,i){ return n||t1+' P'+(i+1); });
     var p2=d.p2.map(function(n,i){ return n||t2+' P'+(i+1); });
-    renderChoosePlayers({t1:t1,t2:t2,overs:d.overs,batFirst:d.batFirst,p1:p1,p2:p2});
+    applyTeamSetup({t1:t1,t2:t2,overs:d.overs,batFirst:d.batFirst},p1,p2);
     return;
   }
 
