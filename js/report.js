@@ -251,19 +251,43 @@ function buildReportHTML(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo
 
 var _pdfHtml='';
 
-/* Wire up beforeprint/afterprint once so fixed overlay prints correctly */
-window.addEventListener('beforeprint', function(){
-  if(!_pdfHtml) return;
-  document.body.setAttribute('data-printing','1');
-});
+/* afterprint: remove the normal-flow print frame */
 window.addEventListener('afterprint', function(){
-  document.body.removeAttribute('data-printing');
+  var f=document.getElementById('pdf-print-frame');
+  if(f) f.remove();
+  var s=document.getElementById('pdf-report-styles');
+  if(s) s.remove();
 });
+
+function _doPrint(){
+  if(!_pdfHtml) return;
+  /* Inject report CSS into <head> */
+  var styleEl=document.getElementById('pdf-report-styles');
+  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pdf-report-styles'; document.head.appendChild(styleEl); }
+  var combinedCss='';
+  var stripped=_pdfHtml.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi,function(_,css){ combinedCss+=css; return ''; });
+  styleEl.textContent=combinedCss;
+  /* Create a normal block-level div (not fixed) — Chrome prints this reliably */
+  var old=document.getElementById('pdf-print-frame');
+  if(old) old.remove();
+  var frame=document.createElement('div');
+  frame.id='pdf-print-frame';
+  frame.innerHTML=stripped;
+  document.body.appendChild(frame);
+  window.print();
+  /* afterprint listener above will clean up frame + styles */
+  /* fallback cleanup if afterprint never fires (some browsers) */
+  setTimeout(function(){
+    var el=document.getElementById('pdf-print-frame');
+    if(el) el.remove();
+    var s=document.getElementById('pdf-report-styles');
+    if(s) s.remove();
+  }, 3000);
+}
 
 function printOverlay(html){
   _pdfHtml=html;
-
-  /* Hoist any <style> blocks out of the html into <head> so they apply on print */
+  /* Hoist styles for the on-screen preview */
   var styleEl=document.getElementById('pdf-report-styles');
   if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pdf-report-styles'; document.head.appendChild(styleEl); }
   var combinedCss='';
@@ -279,7 +303,7 @@ function printOverlay(html){
   overlay.innerHTML=
     '<div id="pdf-overlay-bar">'+
       '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\';_pdfHtml=\'\';">&#8592; Back</button>'+
-      '<button id="pdf-print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'+
+      '<button id="pdf-print-btn" onclick="_doPrint()">&#128438; Print / Save PDF</button>'+
     '</div>'+
     '<div id="pdf-overlay-body">'+stripped+'</div>';
   overlay.style.display='block';
