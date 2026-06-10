@@ -4,16 +4,7 @@
   var liveM=hash.match(/[#&]live=([A-Z0-9]{6})/);
   var stateM=hash.match(/[#&]s=([^&]+)/);
   if(liveM){
-    var code=liveM[1];
-    document.getElementById('main-content').innerHTML=
-      '<div class="setup-panel" style="text-align:center;padding:40px 20px">'+
-      '<div style="font-size:52px;margin-bottom:14px">🏏</div>'+
-      '<div style="font-size:18px;font-weight:800;margin-bottom:8px">Connecting to live score...</div>'+
-      '<div style="background:#E1F5EE;color:#0F6E56;border-radius:12px;padding:12px 20px;display:inline-block;font-size:28px;font-weight:900;letter-spacing:4px;margin:10px 0">'+code+'</div>'+
-      '<div style="font-size:13px;color:#aaa;margin-top:10px">Waiting for scorer&#8230;</div>'+
-      '<div id="live-dot" style="font-size:13px;color:#0F6E56;font-weight:600;margin-top:8px">⏳ Connecting...</div>'+
-      '</div>';
-    joinLiveRoom(code);
+    showJoinScreen(liveM[1]);
     return;
   }
   if(stateM){

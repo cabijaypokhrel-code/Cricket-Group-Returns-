@@ -47,6 +47,15 @@ function renderSetup(){
       '<button class="btn-primary" data-action="start-match">&#127951; Start Match</button>'+
     '<button class="btn-secondary" data-action="show-history" style="margin-top:8px">&#128202; Match History &amp; Saved Progress</button>'+
     '</div>'+
+    '<div class="setup-panel">'+
+      '<h3>&#128225; Join a Live Match</h3>'+
+      '<div style="font-size:12.5px;color:var(--c-text-soft);margin-bottom:10px">Watching someone else\'s match? Enter the 6-character room code from the scorer.</div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<input id="inp-join-code" class="modal-input" style="margin:0;flex:1;text-transform:uppercase;letter-spacing:3px;font-weight:700;text-align:center" maxlength="6" placeholder="ABC123" autocomplete="off">'+
+        '<button class="btn-primary" style="width:auto;padding:10px 18px;margin:0;font-size:14px" data-action="join-live">Join</button>'+
+      '</div>'+
+      '<div id="join-err" style="font-size:12px;color:#c0392b;margin-top:6px;display:none">Enter the 6-character code (letters and numbers).</div>'+
+    '</div>'+
     '<div class="setup-panel"><h3>Team 1 &mdash; Playing XI</h3><div class="player-inputs">'+t1inp+'</div></div>'+
     '<div class="setup-panel"><h3>Team 2 &mdash; Playing XI</h3><div class="player-inputs">'+t2inp+'</div></div>';
 }
@@ -980,6 +989,7 @@ document.addEventListener('click', function(e){
     case 'back-to-setup':         S.phase='setup'; render(); break;
     case 'save-progress':         saveProgress(); break;
     case 'share-match':           shareMatch(); break;
+    case 'join-live':             joinFromInput(); break;
     case 'load-progress':         loadProgress(); break;
     case 'clear-progress':        clearProgress(); renderHistory(); break;
     case 'use-players':

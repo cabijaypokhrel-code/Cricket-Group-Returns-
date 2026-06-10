@@ -103,6 +103,32 @@ function shareWithLink(){
 
 function shareMatch(){ startLiveRoom(); }
 
+function showJoinScreen(code){
+  history.replaceState(null,'',location.pathname+'#live='+code);
+  document.getElementById('main-content').innerHTML=
+    '<div class="setup-panel" style="text-align:center;padding:40px 20px">'+
+    '<div style="font-size:52px;margin-bottom:14px">🏏</div>'+
+    '<div style="font-size:18px;font-weight:800;margin-bottom:8px">Connecting to live score...</div>'+
+    '<div style="background:#E1F5EE;color:#0F6E56;border-radius:12px;padding:12px 20px;display:inline-block;font-size:28px;font-weight:900;letter-spacing:4px;margin:10px 0">'+code+'</div>'+
+    '<div style="font-size:13px;color:#aaa;margin-top:10px">Waiting for scorer&#8230;</div>'+
+    '<div id="live-dot" style="font-size:13px;color:#0F6E56;font-weight:600;margin-top:8px">⏳ Connecting...</div>'+
+    '<button class="btn-cancel" style="margin-top:20px;width:auto;padding:10px 24px" onclick="location.hash=\'\';location.reload()">&#8592; Back</button>'+
+    '</div>';
+  joinLiveRoom(code);
+}
+
+function joinFromInput(){
+  var inp=document.getElementById('inp-join-code');
+  var err=document.getElementById('join-err');
+  var code=(inp?inp.value:'').trim().toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code)){
+    if(err) err.style.display='block';
+    return;
+  }
+  if(err) err.style.display='none';
+  showJoinScreen(code);
+}
+
 function joinLiveRoom(code){
   _loadPeerJS(function(){
     try{
