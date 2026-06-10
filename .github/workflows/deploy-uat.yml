@@ -1,15 +1,15 @@
-name: Deploy to Production
+name: Deploy to UAT
 
 on:
   push:
-    branches: [main]
+    branches: [uat]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: deploy-production
+  group: deploy-uat
   cancel-in-progress: true
 
 jobs:
@@ -19,11 +19,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to GitHub Pages (production)
+      - name: Deploy to GitHub Pages (UAT)
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: .
+          target-folder: uat
           clean: true
-          clean-exclude: |
-            uat/
