@@ -546,7 +546,10 @@ function renderScoring(){
           '<button class="btn" style="flex:1;font-size:12px;padding:10px 2px" data-action="save-progress">&#128190; Save</button>'+
           '<button class="btn btn-danger" style="flex:1;font-size:12px;padding:10px 2px" data-action="end-innings">End Inn.</button>'+
         '</div>'+
-        '<button class="btn" style="width:100%;background:var(--c-blue-soft);color:#1d4fb0;border-color:#c7d8fb;font-size:13px;font-weight:700;padding:12px 4px;margin-bottom:10px" data-action="share-match">&#128225; Share Live Score</button>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+          '<button class="btn" style="background:var(--c-blue-soft);color:#1d4fb0;border-color:#c7d8fb;font-size:12px;font-weight:700;padding:10px 4px" data-action="share-match">&#128225; Share</button>'+
+          '<button class="btn" style="background:var(--c-amber-soft);color:var(--c-amber);border-color:#f5dca0;font-size:12px;font-weight:700;padding:10px 4px" data-action="export-pdf">&#128438; Export PDF</button>'+
+        '</div>'+
         (function(){
           var dotCnt=0,fourCnt=0,sixCnt=0,extraCnt=0,runsCnt=0;
           S.thisBalls.forEach(function(b){
@@ -894,10 +897,10 @@ function renderResult(){
       '</div>'+
     '</div>'+
 
-    '<div class="tabs" id="result-tabs">'+
-      ['inn1bat','inn1bowl','inn2bat','inn2bowl'].map(function(t,i){
-        var labels=['1st Bat','1st Bowl','2nd Bat','2nd Bowl'];
-        return '<div class="tab'+(i===0?' active':'')+'" data-action="result-tab" data-val="'+t+'">'+labels[i]+'</div>';
+    '<div class="tabs" id="result-tabs" style="overflow-x:auto;white-space:nowrap;display:flex;scrollbar-width:none">'+
+      ['inn1bat','inn1bowl','inn2bat','inn2bowl','analysis'].map(function(t,i){
+        var labels=['1st Bat','1st Bowl','2nd Bat','2nd Bowl','📊 Charts'];
+        return '<div class="tab'+(i===0?' active':'')+'" style="flex-shrink:0" data-action="result-tab" data-val="'+t+'">'+labels[i]+'</div>';
       }).join('')+
     '</div>'+
     '<div id="result-tab-content" class="card">'+
@@ -910,11 +913,14 @@ function renderResult(){
     '<button class="btn-secondary" data-action="new-match">&#128260; New Match</button>';
 
   /* store batting/bowling tables for tab switching */
+  var oh1=S.inn1overHistory.length?S.inn1overHistory:S.overHistory;
+  var oh2=S.overHistory;
   S._resultTabs={
     inn1bat:'<div class="section-title">'+bt+' — Batting</div>'+makeBatTable(S.inn1batting,S.inn1battingOrder,s1)+(makeFow(S.inn1fow)?'<div class="section-title" style="margin-top:8px">Fall of Wickets</div>'+makeFow(S.inn1fow):''),
     inn1bowl:'<div class="section-title">'+bw+' — Bowling (Inn. 1)</div>'+makeBowlTable(S.inn1bowling,S.inn1bowlingOrder),
     inn2bat:'<div class="section-title">'+bw+' — Batting</div>'+makeBatTable(S.batting,S.battingOrder,s2)+(makeFow(S.fow)?'<div class="section-title" style="margin-top:8px">Fall of Wickets</div>'+makeFow(S.fow):''),
     inn2bowl:'<div class="section-title">'+bt+' — Bowling (Inn. 2)</div>'+makeBowlTable(S.bowling,S.bowlingOrder),
+    analysis: buildAnalysisHTML(S.match,s1,s2,oh1,oh2,S.inn1fow,S.fow),
   };
   document.getElementById('main-content').innerHTML=html;
 }

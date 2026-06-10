@@ -81,7 +81,11 @@ function saveMatchToHistory(){
       inn2bowling: JSON.parse(JSON.stringify(bw2)),
       inn2fow: JSON.parse(JSON.stringify(fow2)),
       inn2battingOrder: S.battingOrder.slice(),
-      inn2bowlingOrder: S.bowlingOrder.slice()
+      inn2bowlingOrder: S.bowlingOrder.slice(),
+      inn1overHistory: JSON.parse(JSON.stringify(S.inn1overHistory||[])),
+      inn2overHistory: JSON.parse(JSON.stringify((S.innings===2||S.phase==='result')?S.overHistory:[])),
+      inn1fow2: JSON.parse(JSON.stringify(fow1)),
+      inn2fow2: JSON.parse(JSON.stringify(fow2))
     };
     var history = getMatchHistory();
     history.unshift(entry);
