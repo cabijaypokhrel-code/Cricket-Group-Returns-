@@ -10,15 +10,18 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Cricket">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="css/styles.css?v=15">
+<link rel="stylesheet" href="css/styles.css?v=16">
 </head>
 <body>
 <div class="ca-credit">&#9733; CA Bijay Pokhrel</div>
 <div class="app">
   <div class="header" style="display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <h1 id="match-title" style="display:flex;align-items:center;gap:10px"><img id="header-logo" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;display:none">🏏 Saturday Cricket Team </h1>
-      <p id="match-subtitle">Set up a new match to begin</p>
+    <div style="display:flex;align-items:center;gap:8px;min-width:0">
+      <button id="header-home-btn" onclick="headerHome()" style="display:none;background:none;border:1.5px solid var(--c-border);cursor:pointer;font-size:18px;padding:5px 8px;border-radius:8px;line-height:1;flex-shrink:0" title="Back to Home">🏠</button>
+      <div style="min-width:0">
+        <h1 id="match-title" style="display:flex;align-items:center;gap:8px"><img id="header-logo" src="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;display:none">🏏 Saturday Cricket Team </h1>
+        <p id="match-subtitle">Set up a new match to begin</p>
+      </div>
     </div>
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙 Dark</button>
   </div>
@@ -26,18 +29,18 @@
   <div id="main-content"></div>
 </div>
 
-<script src="js/logo.js?v=15"></script>
-<script src="js/images.js?v=15"></script>
-<script src="js/state.js?v=15"></script>
-<script src="js/scoring.js?v=15"></script>
-<script src="js/report.js?v=15"></script>
-<script src="js/setup.js?v=15"></script>
-<script src="js/share.js?v=15"></script>
-<script src="js/render.js?v=15"></script>
-<script src="js/storage.js?v=15"></script>
-<script src="js/ui.js?v=15"></script>
-<script src="js/history.js?v=15"></script>
-<script src="js/app.js?v=15"></script>
+<script src="js/logo.js?v=16"></script>
+<script src="js/images.js?v=16"></script>
+<script src="js/state.js?v=16"></script>
+<script src="js/scoring.js?v=16"></script>
+<script src="js/report.js?v=16"></script>
+<script src="js/setup.js?v=16"></script>
+<script src="js/share.js?v=16"></script>
+<script src="js/render.js?v=16"></script>
+<script src="js/storage.js?v=16"></script>
+<script src="js/ui.js?v=16"></script>
+<script src="js/history.js?v=16"></script>
+<script src="js/app.js?v=16"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {

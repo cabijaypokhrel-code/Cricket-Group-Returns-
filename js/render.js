@@ -7,7 +7,7 @@ function render(){
   document.getElementById('match-title').childNodes[document.getElementById('match-title').childNodes.length-1].textContent='🏏 '+(t1&&t2?t1+' vs '+t2:'Saturday Cricket Team');
   if(S.phase==='history'){
     document.getElementById('match-subtitle').textContent='Match History';
-    renderHistory(); return;
+    renderHistory();
   } else if(S.phase==='setup'){
     document.getElementById('match-subtitle').textContent='Set up a new match to begin';
     renderSetup();
@@ -24,6 +24,7 @@ function render(){
     renderResult();
   }
   if(S.phase==='scoring'||S.phase==='result') updateShareHash();
+  _updateHomeBtn();
 }
 
 /* ── HOME SCREEN ─────────────────────────────────────────────────────── */
