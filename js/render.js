@@ -4,7 +4,9 @@ function render(){
   var t1=S.match.team1, t2=S.match.team2;
   var logoEl=document.getElementById('header-logo');
   if(logoEl){ logoEl.src=TEAM_LOGO; logoEl.style.display=(t1&&t2?'inline-block':'none'); }
-  document.getElementById('match-title').childNodes[document.getElementById('match-title').childNodes.length-1].textContent='🏏 '+(t1&&t2?t1+' vs '+t2:'Saturday Cricket Team');
+  var titleNode=document.getElementById('match-title');
+  var setTitle=function(txt){ titleNode.childNodes[titleNode.childNodes.length-1].textContent=txt; };
+  setTitle('🏏 '+(t1&&t2?t1+' vs '+t2:'Saturday Cricket Team'));
   if(S.phase==='history'){
     document.getElementById('match-subtitle').textContent='Match History';
     renderHistory();
@@ -17,7 +19,15 @@ function render(){
   } else if(S.phase==='scoring'){
     var bt=S.match.batFirst, bw=bt===t1?t2:t1;
     var batting=S.innings===1?bt:bw;
-    document.getElementById('match-subtitle').textContent='Innings '+S.innings+' — '+batting+' batting';
+    // Sticky header shows the LIVE SCORE so it stays visible on every tab
+    var s=sc();
+    setTitle('🏏 '+s.runs+'/'+s.wickets+' ('+overs(s)+' ov)');
+    var sub=batting+' batting · Inn '+S.innings;
+    if(S.innings===2){
+      var tg=target();
+      if(s.runs<tg) sub+=' · Need '+(tg-s.runs)+' off '+Math.max(0,(S.match.overs*6)-s.balls)+'b';
+    }
+    document.getElementById('match-subtitle').textContent=sub;
     renderScoring();
   } else {
     document.getElementById('match-subtitle').textContent='Match complete';
