@@ -1,3 +1,23 @@
+function headerHome(){
+  if(S.phase==='scoring'){
+    if(!confirm('Leave the current match? Unsaved progress will be lost.\n\nTip: use "Save" first to keep your progress.')) return;
+  }
+  LIVE._matchEnded=true; // stop any live reconnect loops
+  clearTimeout(LIVE._retryTimer);
+  try{ if(LIVE.peer){ LIVE.peer.destroy(); LIVE.peer=null; } }catch(e){}
+  LIVE.hosting=false; LIVE.code=null; LIVE.conns=[];
+  history.replaceState(null,'',location.pathname);
+  S.phase='setup';
+  render();
+}
+
+function _updateHomeBtn(){
+  var btn=document.getElementById('header-home-btn');
+  if(!btn) return;
+  var show = (S.phase!=='setup') || (location.hash&&location.hash.length>1);
+  btn.style.display = show ? 'inline-block' : 'none';
+}
+
 function showTeamMilestone(s, milestone){
   var battingTeam=S.innings===1?S.match.batFirst:(S.match.batFirst===S.match.team1?S.match.team2:S.match.team1);
   var labels={50:'Team 50! 🏏',100:'Team Century! 💯',150:'Team 150! 🚀',200:'Team 200! 🏆',250:'Team 250! ⭐',300:'Team 300! 🔥'};

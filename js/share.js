@@ -369,5 +369,8 @@ function renderSharedView(d,skipBanner){
   }
   document.getElementById('main-content').innerHTML=html;
   if(skipBanner) _updateLiveDot('🟢 LIVE');
+  /* show home button for live viewer */
+  var hb=document.getElementById('header-home-btn');
+  if(hb) hb.style.display='inline-block';
 }
 // ─────────────────────────────────────────────────────────────────────
