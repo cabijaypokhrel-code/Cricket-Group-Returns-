@@ -1493,9 +1493,9 @@ body.dark {
    ═══════════════════════════════════════════════════════════════════════ */
 .ca-credit {
   position: fixed;
-  bottom: 14px;
-  right: 14px;
-  font-size: 10px;
+  top: 6px;
+  right: 6px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--c-primary);
   opacity: .9;
@@ -1503,10 +1503,9 @@ body.dark {
   z-index: 9999;
   pointer-events: none;
   background: rgba(255,255,255,.92);
-  backdrop-filter: blur(6px);
-  padding: 5px 12px;
+  padding: 3px 8px;
   border-radius: 20px;
-  box-shadow: var(--shadow-sm);
+  opacity: 0.55;
 }
 
 body.dark .ca-credit { background: rgba(30,41,59,.92); }
