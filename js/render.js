@@ -255,6 +255,7 @@ function renderScoring(){
         '<div class="score-detail"><div class="score-overs">'+overs(s)+' overs</div><div class="score-rr">RR: '+rr(s)+'</div></div>'+
       '</div>'+
       targetBar+
+      (S.freeHit?'<div class="freehit-banner">⚡ FREE HIT — batter cannot be out except run out</div>':'')+
       '<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+ballsHtml+'</div></div>'+
     '</div>';
 
@@ -269,7 +270,9 @@ function renderScoring(){
   } else if(S.dismissalPending){
     var bname=bat().name;
     var wname=bowl().name;
-    var types=[
+    var types=S.freeHit?[
+      {id:'runout', icon:'<img src="'+RUNOUT_IMG+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:'Run Out', desc:'Only valid dismissal'},
+    ]:[
       {id:'bowled',    icon:'<img src="'+BOWLED_IMG+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Bowled",      desc:"Ball hits stumps"},
       {id:'caught',    icon:'<img src="'+CAUGHT_IMG+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Caught",     desc:"Fielder/keeper catch"},
       {id:'stumped',   icon:'<img src="'+STUMPED_IMG+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">', label:"Stumped",    desc:"Keeper hits stumps"},
@@ -359,6 +362,7 @@ function renderScoring(){
     var canConfirm = dt && dt!=='';
     html+=
       '<div class="modal-box modal-red">'+
+        (S.freeHit?'<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:700;color:#6d28d9">⚡ FREE HIT — only Run Out is valid</div>':'')+
         '<div class="modal-title-red">&#128308; How was '+bname+' dismissed?</div>'+
         '<div class="dism-grid">'+typeGrid+'</div>'+
         detailHtml+
@@ -1012,7 +1016,8 @@ document.addEventListener('click', function(e){
     var t1=d.t1, t2=d.t2;
     var p1=d.p1.map(function(n,i){ return n||t1+' P'+(i+1); });
     var p2=d.p2.map(function(n,i){ return n||t2+' P'+(i+1); });
-    applyTeamSetup({t1:t1,t2:t2,overs:d.overs,batFirst:d.batFirst},p1,p2);
+    var setup={t1:t1,t2:t2,overs:d.overs,batFirst:d.batFirst};
+    showCoinFlip(d, function(){ applyTeamSetup(setup,p1,p2); });
     return;
   }
 

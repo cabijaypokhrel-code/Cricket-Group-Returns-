@@ -89,9 +89,11 @@ function startLiveRoom(){
         conn.on('open',function(){
           conn.send(encodeShareState());
           showToast('👀 Viewer connected ('+LIVE.conns.length+' watching)');
+          _setLiveBtn('📡 '+id+' · 👀 '+LIVE.conns.length);
         });
         conn.on('close',function(){
           LIVE.conns=LIVE.conns.filter(function(c){return c!==conn;});
+          _setLiveBtn(LIVE.conns.length?'📡 '+id+' · 👀 '+LIVE.conns.length:'📡 Room: '+id);
         });
       });
       peer.on('error',function(){
