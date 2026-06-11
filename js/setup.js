@@ -31,12 +31,12 @@ function confirmBowler(){
   for(var i=0;i<S.bowling.length;i++){ if(S.bowling[i].name===name){ idx=i; break; } }
   if(idx===-1){ S.bowling.push({name:name,overs:0,balls:0,runs:0,wickets:0}); idx=S.bowling.length-1; }
   if(S.bowlingOrder.indexOf(idx)<0) S.bowlingOrder.push(idx);
-  S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; render();
+  S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; S.overSummary=null; render();
 }
 
 function pickBowler(idx){
   if(S.bowlingOrder.indexOf(idx)<0) S.bowlingOrder.push(idx);
-  S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; render();
+  S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; S.overSummary=null; render();
 }
 
 function pickStriker(idx){

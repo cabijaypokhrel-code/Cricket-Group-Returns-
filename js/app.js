@@ -16,6 +16,18 @@ _applyStoredTheme();
       if(d2&&d2.v){ renderSharedView(d2); return; }
     }catch(e){}
   }
+  // Auto-restore in-progress match if available
+  if(hasSavedProgress()){
+    try{
+      var raw=localStorage.getItem('cricket_progress');
+      var data=JSON.parse(raw);
+      if(data&&data.S&&(data.S.phase==='scoring'||data.S.phase==='result')){
+        Object.assign(S, data.S);
+        S.snapshots=[];
+        S._autoRestored=true;
+      }
+    }catch(e){}
+  }
   render();
 })();
 

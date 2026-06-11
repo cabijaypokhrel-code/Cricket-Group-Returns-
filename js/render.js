@@ -228,24 +228,39 @@ function renderScoring(){
       var chasePct=Math.min(100,Math.round((s.runs/tgt)*100));
       var curRRnum=parseFloat(rr(s)), reqRRnum=parseFloat(reqRR);
       var meterColor=reqRRnum>curRRnum+3?'#791F1F':reqRRnum>curRRnum?'#633806':'#0F6E56';
+      var ballsLeft=reqB>0?reqB:0;
       targetBar=
-        '<div class="target-bar" style="padding:10px 12px">'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
-            '<span style="font-size:13px;font-weight:700">&#127919; Need '+reqR+' off '+reqB+'b</span>'+
-            '<span style="font-size:12px;font-weight:700;color:'+meterColor+'">Req RR: '+reqRR+'</span>'+
+        '<div class="target-bar" style="padding:12px 14px;border-left:4px solid '+meterColor+'">'+
+          '<div style="font-size:22px;font-weight:800;color:'+meterColor+';letter-spacing:-0.5px;line-height:1">Need '+reqR+' off '+ballsLeft+'b</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px">'+
+            '<span style="font-size:12px;color:var(--c-text-soft)">Target: <strong style="color:var(--c-text)">'+tgt+'</strong> &nbsp;·&nbsp; Cur RR: <strong>'+rr(s)+'</strong></span>'+
+            '<span style="font-size:13px;font-weight:700;color:'+meterColor+'">Req RR '+reqRR+'</span>'+
           '</div>'+
-          '<div style="background:rgba(0,0,0,0.12);border-radius:8px;height:8px;overflow:hidden">'+
-            '<div style="background:linear-gradient(90deg,'+meterColor+','+meterColor+'cc);width:'+chasePct+'%;height:100%;border-radius:8px;transition:width 0.4s ease"></div>'+
-          '</div>'+
-          '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--c-text-soft);margin-top:4px">'+
-            '<span>'+s.runs+' scored</span>'+
-            '<span>Target: '+tgt+'</span>'+
+          '<div style="background:rgba(0,0,0,0.12);border-radius:8px;height:6px;overflow:hidden">'+
+            '<div style="background:'+meterColor+';width:'+chasePct+'%;height:100%;border-radius:8px;transition:width 0.4s ease"></div>'+
           '</div>'+
         '</div>';
     }
   }
 
+  var extrasTotal=(s.wide||0)+(s.nb||0)+(s.byes||0)+(s.legbyes||0);
+  var extrasRow='<div style="display:flex;gap:10px;padding:6px 12px 8px;font-size:12px;color:var(--c-text-soft);border-top:1px solid var(--c-border)">'+
+    '<span>Extras <strong style="color:var(--c-text)">'+extrasTotal+'</strong></span>'+
+    (s.wide?'<span>Wd <strong>'+s.wide+'</strong></span>':'')+
+    (s.nb?'<span>NB <strong>'+s.nb+'</strong></span>':'')+
+    (s.byes?'<span>B <strong>'+s.byes+'</strong></span>':'')+
+    (s.legbyes?'<span>LB <strong>'+s.legbyes+'</strong></span>':'')+
+  '</div>';
+
+  var restoreBanner=S._autoRestored?
+    '<div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:13px">'+
+      '<span>&#9889; Match restored from last session</span>'+
+      '<button style="background:none;border:none;color:#7B5800;font-weight:700;cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid #FFD54F" data-action="dismiss-restore-banner">Dismiss</button>'+
+    '</div>':
+    '';
+
   var html=
+    restoreBanner+
     '<div class="scoreboard">'+
       '<div class="scoreboard-top">'+
         '<div class="scoreboard-team"><img src="'+TEAM_LOGO+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">'+battingTeam+' &#127951;</div>'+
@@ -255,6 +270,7 @@ function renderScoring(){
         '<div class="score-runs">'+s.runs+'/'+s.wickets+'</div>'+
         '<div class="score-detail"><div class="score-overs">'+overs(s)+' overs</div><div class="score-rr">RR: '+rr(s)+'</div></div>'+
       '</div>'+
+      extrasRow+
       targetBar+
       (S.freeHit?'<div class="freehit-banner">⚡ FREE HIT — batter cannot be out except run out</div>':'')+
       '<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+ballsHtml+'</div></div>'+
@@ -406,6 +422,25 @@ function renderScoring(){
           '<input id="new-bat-inp" class="modal-input" style="margin-bottom:0;flex:1" placeholder="Player name (not in XI)">'+
           '<button class="btn-primary" style="width:auto;padding:10px 14px;margin:0;font-size:13px" data-action="confirm-batsman">&#10003;</button>'+
         '</div>'+
+      '</div>';
+  } else if(S.overSummary && S.overDone && !S.bowlerConfirmed){
+    // Over summary shown between over end and new bowler pick
+    var os=S.overSummary;
+    var osBalls=os.balls.map(function(b){ return '<div class="ball ball-'+ballClass(b)+'">'+b+'</div>'; }).join('');
+    var osRuns=os.balls.reduce(function(a,b){ var n=parseInt(b); return a+(isNaN(n)?0:n); },0);
+    var osWkts=os.balls.filter(function(b){ return b==='W'||b.endsWith('W'); }).length;
+    var osDots=os.balls.filter(function(b){ return b==='0'; }).length;
+    html+=
+      '<div style="background:linear-gradient(135deg,#0F6E56,#0a5040);color:#fff;border-radius:14px;padding:16px;margin-bottom:12px">'+
+        '<div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:.75;margin-bottom:4px">OVER '+os.overNum+' COMPLETE</div>'+
+        '<div style="font-size:13px;font-weight:600;margin-bottom:10px;opacity:.9">'+os.bowler+'</div>'+
+        '<div class="over-balls" style="justify-content:flex-start;margin-bottom:12px">'+osBalls+'</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">'+
+          '<div><div style="font-size:22px;font-weight:800">'+osRuns+'</div><div style="font-size:10px;opacity:.7;margin-top:2px">Runs</div></div>'+
+          '<div><div style="font-size:22px;font-weight:800">'+osWkts+'</div><div style="font-size:10px;opacity:.7;margin-top:2px">Wickets</div></div>'+
+          '<div><div style="font-size:22px;font-weight:800">'+osDots+'</div><div style="font-size:10px;opacity:.7;margin-top:2px">Dots</div></div>'+
+        '</div>'+
+        '<button class="btn-secondary" style="margin-top:14px;width:100%;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:#fff;font-weight:700" data-action="dismiss-over-summary">Continue &#8594;</button>'+
       '</div>';
   } else if(S.overDone||!S.bowlerConfirmed){
     var lastBowlerIdx=(S.bowlerConfirmed && bowl().balls>0) ? S.bowlerIdx : -1;
@@ -1057,6 +1092,8 @@ document.addEventListener('click', function(e){
     case 'new-match':         resetMatch(); break;
     case 'show-history':      S.phase='history'; renderHistory(); break;
     case 'back-to-setup':     S.phase='setup'; render(); break;
+    case 'dismiss-restore-banner': S._autoRestored=false; render(); break;
+    case 'dismiss-over-summary':   S.overSummary=null; render(); break;
     case 'save-progress':     saveProgress(); break;
     case 'share-match':       shareMatch(); break;
     case 'join-live':         joinFromInput(); break;

@@ -1,26 +1,36 @@
+function _buildSaveData(){
+  return {
+    S: {
+      phase:S.phase, match:S.match, innings:S.innings,
+      t1:S.t1, t2:S.t2,
+      batting:S.batting, bowling:S.bowling,
+      strikerIdx:S.strikerIdx, nonStrikerIdx:S.nonStrikerIdx, bowlerIdx:S.bowlerIdx,
+      thisBalls:S.thisBalls, thisBallsRunout:S.thisBallsRunout,
+      overHistory:S.overHistory, overBowlers:S.overBowlers, fow:S.fow,
+      wicketPending:S.wicketPending, outIdx:S.outIdx,
+      overDone:S.overDone, editStriker:S.editStriker, editBowler:S.editBowler,
+      extrasPanel:S.extrasPanel, activeTab:S.activeTab,
+      inn1batting:S.inn1batting, inn1bowling:S.inn1bowling, inn1fow:S.inn1fow,
+      inn1overHistory:S.inn1overHistory, inn1overBowlers:S.inn1overBowlers||[], inn1score:S.inn1score,
+      battingOrder:S.battingOrder, inn1battingOrder:S.inn1battingOrder||[], bowlingOrder:S.bowlingOrder, inn1bowlingOrder:S.inn1bowlingOrder||[],
+      bowlerConfirmed:S.bowlerConfirmed, dismissalPending:S.dismissalPending,
+      dismissalType:S.dismissalType, confirmEndInnings:S.confirmEndInnings,
+      inn1Complete:S.inn1Complete, freeHit:S.freeHit, overSummary:S.overSummary||null,
+      partnershipRuns:S.partnershipRuns, partnershipBalls:S.partnershipBalls,
+      partnershipBreaks:S.partnershipBreaks
+    },
+    savedAt: new Date().toLocaleString()
+  };
+}
+
+function autoSave(){
+  if(S.phase!=='scoring' && S.phase!=='result') return;
+  try { localStorage.setItem('cricket_progress', JSON.stringify(_buildSaveData())); } catch(e){}
+}
+
 function saveProgress(){
   try {
-    var saveData = {
-      S: {
-        phase:S.phase, match:S.match, innings:S.innings,
-        t1:S.t1, t2:S.t2,
-        batting:S.batting, bowling:S.bowling,
-        strikerIdx:S.strikerIdx, nonStrikerIdx:S.nonStrikerIdx, bowlerIdx:S.bowlerIdx,
-        thisBalls:S.thisBalls, thisBallsRunout:S.thisBallsRunout,
-        overHistory:S.overHistory, overBowlers:S.overBowlers, fow:S.fow,
-        wicketPending:S.wicketPending, outIdx:S.outIdx,
-        overDone:S.overDone, editStriker:S.editStriker, editBowler:S.editBowler,
-        extrasPanel:S.extrasPanel, activeTab:S.activeTab,
-        inn1batting:S.inn1batting, inn1bowling:S.inn1bowling, inn1fow:S.inn1fow,
-        inn1overHistory:S.inn1overHistory, inn1overBowlers:S.inn1overBowlers||[], inn1score:S.inn1score,
-        battingOrder:S.battingOrder, inn1battingOrder:S.inn1battingOrder||[], bowlingOrder:S.bowlingOrder, inn1bowlingOrder:S.inn1bowlingOrder||[],
-        bowlerConfirmed:S.bowlerConfirmed, dismissalPending:S.dismissalPending,
-        dismissalType:S.dismissalType, confirmEndInnings:S.confirmEndInnings,
-        inn1Complete:S.inn1Complete
-      },
-      savedAt: new Date().toLocaleString()
-    };
-    localStorage.setItem('cricket_progress', JSON.stringify(saveData));
+    localStorage.setItem('cricket_progress', JSON.stringify(_buildSaveData()));
     showToast('Progress saved ✓');
   } catch(e){ showToast('Could not save — storage unavailable'); }
 }
