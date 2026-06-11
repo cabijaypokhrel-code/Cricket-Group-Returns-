@@ -1,6 +1,8 @@
 function headerHome(){
   if(S.phase==='scoring'){
-    if(!confirm('Leave the current match? Unsaved progress will be lost.\n\nTip: use "Save" first to keep your progress.')) return;
+    if(!confirm('Leave the current match? The match will be discarded.')) return;
+    try{ localStorage.removeItem('cricket_progress'); }catch(e){}
+    S._autoRestored=false;
   }
   LIVE._matchEnded=true; // stop any live reconnect loops
   clearTimeout(LIVE._retryTimer);
