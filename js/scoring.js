@@ -19,7 +19,7 @@ function doRuns(r){
   if(r%2===1) swap();
   if(legalCount()>=6) endOver();
   if(S.innings===2 && target() && sc().runs>=target()) endInnings();
-  else render();
+  else { autoSave(); render(); }
 }
 
 function doWide(extra){
@@ -31,7 +31,7 @@ function doWide(extra){
   if(extra%2===1) swap();
   S.extrasPanel=null;
   if(S.innings===2 && target() && sc().runs>=target()) endInnings();
-  else render();
+  else { autoSave(); render(); }
 }
 
 function doNoBall(extra){
@@ -45,7 +45,7 @@ function doNoBall(extra){
   if(extra%2===1) swap();
   S.extrasPanel=null;
   if(S.innings===2 && target() && sc().runs>=target()) endInnings();
-  else render();
+  else { autoSave(); render(); }
 }
 
 function doBye(r){
@@ -63,7 +63,7 @@ function doBye(r){
   S.extrasPanel=null;
   if(legalCount()>=6) endOver();
   if(S.innings===2 && target() && sc().runs>=target()) endInnings();
-  else render();
+  else { autoSave(); render(); }
 }
 
 function doLegBye(r){
@@ -81,7 +81,7 @@ function doLegBye(r){
   S.extrasPanel=null;
   if(legalCount()>=6) endOver();
   if(S.innings===2 && target() && sc().runs>=target()) endInnings();
-  else render();
+  else { autoSave(); render(); }
 }
 
 function doWicket(){
@@ -175,17 +175,20 @@ function confirmDismissal(type){
   if(s.wickets>=10){ endInnings(); return; }
   S.wicketPending=true; S.outIdx=S.strikerIdx;
   if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
-  render();
+  autoSave(); render();
 }
 
 function endOver(){
-  S.overHistory.push(S.thisBalls.slice());
+  var justBowled=S.thisBalls.slice();
+  S.overHistory.push(justBowled);
   S.overBowlers.push(bowl().name);
   bowl().overs++;
   // DO NOT reset bowl().balls — keep accumulating so total balls = overs*6 + partial
+  S.overSummary={balls:justBowled, bowler:bowl().name, overNum:S.overHistory.length, runs:justBowled.reduce(function(a,b){ var n=parseInt(b); return a+(isNaN(n)?0:n); },0)};
   S.thisBalls=[]; S.thisBallsRunout=[]; swap(); S.overDone=true;
   // End innings if all overs bowled
   if(S.overHistory.length>=S.match.overs){ endInnings(); return; }
+  autoSave(); render();
 }
 
 function endInnings(){

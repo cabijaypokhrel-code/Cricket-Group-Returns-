@@ -23,6 +23,7 @@ var S = {
   confirmEndInnings:false,
   inn1Complete:false,
   freeHit:false,
+  overSummary:null,
   prefillPlayers:null,
   choosePlayersPhase:false
 };
