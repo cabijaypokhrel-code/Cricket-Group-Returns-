@@ -1,5 +1,6 @@
 function doRuns(r){
   saveSnapshot();
+  S.freeHit=false;
   var s=sc(), b=bat(), w=bowl();
   var prevRuns=b.runs;
   s.runs+=r; b.runs+=r; b.balls++; w.runs+=r;
@@ -35,6 +36,7 @@ function doWide(extra){
 
 function doNoBall(extra){
   saveSnapshot();
+  S.freeHit=true;
   var s=sc(), b=bat(), w=bowl(), total=1+extra;
   s.runs+=total; s.nb+=1; w.runs+=total;
   if(extra>0){ b.runs+=extra; }
@@ -48,6 +50,7 @@ function doNoBall(extra){
 
 function doBye(r){
   saveSnapshot();
+  S.freeHit=false;
   var s=sc(), w=bowl();
   s.runs+=r; s.byes=(s.byes||0)+r; w.runs+=r;
   s.balls++; w.balls++;
@@ -65,6 +68,7 @@ function doBye(r){
 
 function doLegBye(r){
   saveSnapshot();
+  S.freeHit=false;
   var s=sc(), w=bowl();
   s.runs+=r; s.legbyes=(s.legbyes||0)+r; w.runs+=r;
   s.balls++; w.balls++;
@@ -223,7 +227,7 @@ function startInn2(){
   S.thisBalls=[]; S.overHistory=[]; S.overBowlers=[]; S.fow=[]; S.partnershipBreaks=[];
   S.partnershipRuns=0; S.partnershipBalls=0;
   S.wicketPending=false; S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null;
-  S.snapshots=[]; S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[];
+  S.snapshots=[]; S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.freeHit=false;
   render();
 }
 
