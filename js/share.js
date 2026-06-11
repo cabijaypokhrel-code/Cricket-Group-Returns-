@@ -89,9 +89,11 @@ function startLiveRoom(){
         conn.on('open',function(){
           conn.send(encodeShareState());
           showToast('👀 Viewer connected ('+LIVE.conns.length+' watching)');
+          _setLiveBtn('📡 '+id+' · 👀 '+LIVE.conns.length);
         });
         conn.on('close',function(){
           LIVE.conns=LIVE.conns.filter(function(c){return c!==conn;});
+          _setLiveBtn(LIVE.conns.length?'📡 '+id+' · 👀 '+LIVE.conns.length:'📡 Room: '+id);
         });
       });
       peer.on('error',function(){
@@ -138,13 +140,14 @@ function joinFromInput(){
 }
 
 function joinLiveRoom(code){
+  LIVE._matchEnded=false;
   function retry(label){
+    if(LIVE._matchEnded) return;
     _updateLiveDot(label+' — retrying…');
     try{ if(LIVE.peer){ LIVE.peer.destroy(); LIVE.peer=null; } }catch(e){}
     clearTimeout(LIVE._retryTimer);
     LIVE._retryTimer=setTimeout(function(){
-      // Stop retrying if user navigated away from the join screen
-      if(document.getElementById('live-dot')) joinLiveRoom(code);
+      if(!LIVE._matchEnded && document.getElementById('live-dot')) joinLiveRoom(code);
     },5000);
   }
   _loadPeerJS(function(){
@@ -158,13 +161,30 @@ function joinLiveRoom(code){
         conn.on('data',function(enc){
           try{
             var d=JSON.parse(decodeURIComponent(escape(atob(enc))));
-            if(d&&d.v) renderSharedView(d,true);
+            if(d&&d.v){
+              renderSharedView(d,true);
+              if(d.ph==='result'){
+                LIVE._matchEnded=true;
+                clearTimeout(LIVE._retryTimer);
+                try{ conn.close(); }catch(e){}
+                try{ peer.destroy(); }catch(e){}
+              }
+            }
           }catch(e){}
         });
-        conn.on('close',function(){ retry('⚪ Scorer offline'); });
-        conn.on('error',function(){ retry('⚪ Cannot connect'); });
+        conn.on('close',function(){
+          if(LIVE._matchEnded) return;
+          retry('⚪ Scorer offline');
+        });
+        conn.on('error',function(){
+          if(LIVE._matchEnded) return;
+          retry('⚪ Cannot connect');
+        });
       });
-      peer.on('error',function(){ retry('⚪ Cannot connect'); });
+      peer.on('error',function(){
+        if(LIVE._matchEnded) return;
+        retry('⚪ Cannot connect');
+      });
     }catch(e){ retry('⚪ Cannot connect'); }
   });
 }
@@ -244,6 +264,49 @@ function renderSharedView(d,skipBanner){
   }
   document.getElementById('match-subtitle').textContent=mn.t1+' vs '+mn.t2+' · '+mn.ov+' overs';
   document.getElementById('match-title').childNodes[document.getElementById('match-title').childNodes.length-1].textContent='🏏 '+mn.t1+' vs '+mn.t2;
+
+  /* ── Match-ended screen ── */
+  if(isResult){
+    var endHtml=
+      '<div class="result-screen">'+
+        '<div class="result-winner">'+
+          '<div class="result-trophy">&#127942;</div>'+
+          '<div class="result-text">'+result+'</div>'+
+          '<div class="result-meta">'+mn.t1+' vs '+mn.t2+' &nbsp;·&nbsp; '+mn.ov+' overs</div>'+
+        '</div>'+
+        '<div class="result-score-grid">'+
+          '<div class="result-score-block">'+
+            '<div class="result-score-team">'+bat1+'</div>'+
+            '<div class="result-score-runs">'+s1.runs+'/'+s1.wickets+'</div>'+
+            '<div class="result-score-overs">'+ovStr(s1)+' ov</div>'+
+          '</div>'+
+          '<div class="result-score-block">'+
+            '<div class="result-score-team">'+bat2+'</div>'+
+            '<div class="result-score-runs">'+s2.runs+'/'+s2.wickets+'</div>'+
+            '<div class="result-score-overs">'+ovStr(s2)+' ov</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-md);padding:14px 16px;margin-bottom:14px;text-align:center">'+
+        '<div style="font-size:16px;font-weight:800;color:#dc2626;margin-bottom:4px">🔴 This match has ended</div>'+
+        '<div style="font-size:13px;color:#64748b">The live room is now closed.</div>'+
+      '</div>';
+    /* Final scorecard details */
+    if(ib.length){
+      endHtml+='<div class="card"><div class="section-title">'+bat1+' — 1st Innings Batting</div>'+mkBatTbl(ib,d.io||[],s1)+'</div>';
+      if(iw.length) endHtml+='<div class="card"><div class="section-title">'+bat2+' — Bowling (Inn. 1)</div>'+mkBwlTbl(iw)+'</div>';
+      if(fow1.length) endHtml+='<div class="card"><div class="section-title">Fall of Wickets — '+bat1+'</div>'+mkFow(fow1)+'</div>';
+    }
+    if(batting.length){
+      endHtml+='<div class="card"><div class="section-title">'+bat2+' — 2nd Innings Batting</div>'+mkBatTbl(batting,d.bo||[],s2)+'</div>';
+      if(bowling.length) endHtml+='<div class="card"><div class="section-title">'+bat1+' — Bowling (Inn. 2)</div>'+mkBwlTbl(bowling)+'</div>';
+      if(fow2.length) endHtml+='<div class="card"><div class="section-title">Fall of Wickets — '+bat2+'</div>'+mkFow(fow2)+'</div>';
+    }
+    endHtml+='<button class="btn-secondary" onclick="location.hash=\'\';location.reload()">&#8592; Back to Home</button>';
+    document.getElementById('main-content').innerHTML=endHtml;
+    return;
+  }
+
   var html=
     '<div style="background:linear-gradient(135deg,#0F6E56,#085041);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">'+
       '<div><div style="font-size:11px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:1px">📡 Live Score</div>'+
@@ -251,7 +314,6 @@ function renderSharedView(d,skipBanner){
       '<div style="text-align:right"><div style="font-size:10px;opacity:.7">Snapshot: '+ts+'</div>'+
       '<button onclick="location.reload()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-top:4px">↻</button></div>'+
     '</div>';
-  if(result) html+='<div style="background:#E1F5EE;color:#0F6E56;padding:12px 16px;border-radius:12px;font-size:16px;font-weight:700;text-align:center;margin-bottom:12px">'+result+'</div>';
   html+='<div class="scoreboard" style="margin-bottom:12px">'+
     '<div class="team-names">'+
       '<span class="team-name">'+bat1+(d.inn===1&&!isResult?' &#127951;':'')+'</span>'+
@@ -271,7 +333,7 @@ function renderSharedView(d,skipBanner){
     html+='<div class="target-bar">Target: '+(s1.runs+1)+' &nbsp;•&nbsp; Need '+need+' off '+rb+' balls &nbsp;•&nbsp; RRR: '+(rb>0?((need/(rb/6)).toFixed(2)):'—')+'</div>';
   }
   if(d.tb&&d.tb.length&&!isResult){
-    html+='<div class="this-over"><div class="over-label">This over</div><div class="balls-row">'+
+    html+='<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+
       d.tb.map(function(b){ return '<div class="ball ball-'+ballClass(b)+'">'+b+'</div>'; }).join('')+'</div></div>';
   }
   html+='</div>';

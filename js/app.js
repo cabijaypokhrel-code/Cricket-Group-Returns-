@@ -1,3 +1,6 @@
+// Restore dark mode preference before first render
+_applyStoredTheme();
+
 // Check if opened via a share/live link
 (function(){
   var hash=location.hash;

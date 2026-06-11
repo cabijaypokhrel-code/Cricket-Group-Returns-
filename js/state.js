@@ -22,6 +22,7 @@ var S = {
   thisBallsRunout:[],
   confirmEndInnings:false,
   inn1Complete:false,
+  freeHit:false,
   prefillPlayers:null,
   choosePlayersPhase:false
 };
@@ -34,6 +35,7 @@ function saveSnapshot(){
     thisBalls:S.thisBalls,thisBallsRunout:S.thisBallsRunout.slice(),overHistory:S.overHistory,overBowlers:S.overBowlers.slice(),fow:S.fow,battingOrder:S.battingOrder.slice(),bowlingOrder:S.bowlingOrder.slice(),
     wicketPending:S.wicketPending,outIdx:S.outIdx,
     overDone:S.overDone,innings:S.innings,
+    freeHit:S.freeHit,
     partnershipRuns:S.partnershipRuns,partnershipBalls:S.partnershipBalls
   }));
   if(S.snapshots.length>50) S.snapshots.shift();
@@ -51,7 +53,7 @@ function undoLast(){
   S.partnershipRuns=prev.partnershipRuns||0; S.partnershipBalls=prev.partnershipBalls||0;
   S.battingOrder=prev.battingOrder||S.battingOrder;
   S.bowlingOrder=prev.bowlingOrder||S.bowlingOrder;
-  S.extrasPanel=null; S.editStriker=false; S.editBowler=false; S.confirmEndInnings=false;
+  S.extrasPanel=null; S.editStriker=false; S.editBowler=false; S.confirmEndInnings=false; S.freeHit=prev.freeHit||false;
   render();
 }
 
