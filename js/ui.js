@@ -50,49 +50,6 @@ function _applyStoredTheme(){
   }
 }
 
-function showCoinFlip(wizardData, cb){
-  var tossWon=wizardData.batFirst===wizardData.t1?
-    (wizardData.elect==='bat'?wizardData.t1:wizardData.t2):
-    (wizardData.elect==='bat'?wizardData.batFirst:
-      (wizardData.batFirst===wizardData.t1?wizardData.t2:wizardData.t1));
-  /* reconstruct toss winner from wizard data */
-  var tossTeam = wizardData.toss==='t1' ? wizardData.t1 : wizardData.t2;
-  var elected  = wizardData.elect==='bat' ? 'bat first' : 'bowl first';
-  var overlay=document.createElement('div');
-  overlay.className='coin-overlay';
-  overlay.innerHTML=
-    '<div class="coin-card">'+
-      '<div id="coin-el" class="coin">🪙</div>'+
-      '<div id="coin-status" style="font-size:15px;font-weight:700;color:var(--c-text-soft)">Tossing the coin…</div>'+
-    '</div>';
-  document.body.appendChild(overlay);
-  /* start spin */
-  setTimeout(function(){
-    var coin=document.getElementById('coin-el');
-    if(coin) coin.classList.add('spinning');
-  }, 50);
-  /* show result after spin */
-  setTimeout(function(){
-    var coin=document.getElementById('coin-el');
-    if(coin){ coin.classList.remove('spinning'); coin.textContent='🏆'; }
-    var status=document.getElementById('coin-status');
-    if(status) status.innerHTML=
-      '<div class="coin-result">'+
-        '<div class="coin-toss-team">'+tossTeam+' won the toss!</div>'+
-        '<div class="coin-toss-elected">Elected to '+elected+'</div>'+
-        '<button class="btn-primary" onclick="'+
-          'document.querySelector(\'.coin-overlay\').remove();'+
-        '" style="margin-top:0">&#127951; Start Match</button>'+
-      '</div>';
-    /* attach start to button */
-    var btn=overlay.querySelector('.btn-primary');
-    if(btn) btn.onclick=function(){
-      overlay.remove();
-      cb();
-    };
-  }, 1800);
-}
-
 function showMilestone(name, runs){
   var icons={25:'🏅',50:'⭐',75:'🔥',100:'💯',150:'🚀',200:'🏆'};
   var label={25:'Quarter Century! 🏅',50:'Half Century! ⭐',75:'75 Up! 🔥',100:'CENTURY! 💯',150:'150 Up! 🚀',200:'Double Hundred! 🏆'};

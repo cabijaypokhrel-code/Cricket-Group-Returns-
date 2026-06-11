@@ -1053,7 +1053,7 @@ document.addEventListener('click', function(e){
     var p1=d.p1.map(function(n,i){ return n||t1+' P'+(i+1); });
     var p2=d.p2.map(function(n,i){ return n||t2+' P'+(i+1); });
     var setup={t1:t1,t2:t2,overs:d.overs,batFirst:d.batFirst};
-    showCoinFlip(d, function(){ applyTeamSetup(setup,p1,p2); });
+    applyTeamSetup(setup,p1,p2);
     return;
   }
 
