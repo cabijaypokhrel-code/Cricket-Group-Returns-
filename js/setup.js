@@ -99,13 +99,14 @@ function startMatch(){
   renderChoosePlayers(teamSetup);
 }
 
-function resetMatch(){
-  S.phase='setup'; S.innings=1;
+function _resetMatchState(){
+  S.innings=1;
   S.t1={runs:0,wickets:0,balls:0,wide:0,nb:0,byes:0,legbyes:0};
   S.t2={runs:0,wickets:0,balls:0,wide:0,nb:0,byes:0,legbyes:0};
   S.batting=[]; S.bowling=[];
   S.strikerIdx=0; S.nonStrikerIdx=1; S.bowlerIdx=0;
   S.thisBalls=[]; S.overHistory=[]; S.fow=[]; S.partnershipBreaks=[];
+  S.partnershipRuns=0; S.partnershipBalls=0;
   S.wicketPending=false; S.outIdx=-1;
   S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null; S.activeTab='live';
   S.snapshots=[]; S.inn1batting=[]; S.inn1bowling=[]; S.inn1fow=[]; S.inn1overHistory=[]; S.inn1overBowlers=[]; S.inn1score=null;
@@ -113,6 +114,13 @@ function resetMatch(){
   S.bowlingOrder=[]; S.inn1bowlingOrder=[];
   S.overBowlers=[];
   S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.confirmEndInnings=false;
+  S.inn1Complete=false; S.freeHit=false; S.overSummary=null; S._autoRestored=false;
+  try{ localStorage.removeItem('cricket_progress'); }catch(e){}
+}
+
+function resetMatch(){
+  _resetMatchState();
+  S.phase='setup';
   S.match={team1:'',team2:'',overs:20,batFirst:''};
   S.prefillPlayers=null;
   render();
@@ -154,6 +162,7 @@ function renderChoosePlayers(teamSetup){
 }
 
 function applyTeamSetup(teamSetup, p1override, p2override){
+  _resetMatchState(); // wipe any previous/restored game so scores start at 0
   var t1=teamSetup.t1, t2=teamSetup.t2;
   S.match.team1=t1; S.match.team2=t2;
   S.match.overs=teamSetup.overs;

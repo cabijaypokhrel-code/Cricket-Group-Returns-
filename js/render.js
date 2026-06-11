@@ -254,13 +254,6 @@ function renderScoring(){
   }
 
   var extrasTotal=(s.wide||0)+(s.nb||0)+(s.byes||0)+(s.legbyes||0);
-  var extrasRow='<div style="display:flex;gap:10px;padding:6px 12px 8px;font-size:12px;color:var(--c-text-soft);border-top:1px solid var(--c-border)">'+
-    '<span>Extras <strong style="color:var(--c-text)">'+extrasTotal+'</strong></span>'+
-    (s.wide?'<span>Wd <strong>'+s.wide+'</strong></span>':'')+
-    (s.nb?'<span>NB <strong>'+s.nb+'</strong></span>':'')+
-    (s.byes?'<span>B <strong>'+s.byes+'</strong></span>':'')+
-    (s.legbyes?'<span>LB <strong>'+s.legbyes+'</strong></span>':'')+
-  '</div>';
 
   var restoreBanner=S._autoRestored?
     '<div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:13px">'+
@@ -271,16 +264,13 @@ function renderScoring(){
 
   var html=
     restoreBanner+
-    '<div class="scoreboard">'+
-      '<div class="scoreboard-top">'+
-        '<div class="scoreboard-team"><img src="'+TEAM_LOGO+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">'+battingTeam+' &#127951;</div>'+
-        '<div class="scoreboard-innings-badge">Inn. '+S.innings+'</div>'+
+    '<div class="scoreboard" style="padding:14px 16px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+        '<span style="font-size:12px;color:var(--c-text-soft)">RR: <strong style="color:var(--c-text)">'+rr(s)+'</strong></span>'+
+        '<span style="font-size:12px;color:var(--c-text-soft)">Extras <strong style="color:var(--c-text)">'+extrasTotal+'</strong>'+
+          (s.wide?' · Wd '+s.wide:'')+(s.nb?' · NB '+s.nb:'')+(s.byes?' · B '+s.byes:'')+(s.legbyes?' · LB '+s.legbyes:'')+
+        '</span>'+
       '</div>'+
-      '<div class="score-main">'+
-        '<div class="score-runs">'+s.runs+'/'+s.wickets+'</div>'+
-        '<div class="score-detail"><div class="score-overs">'+overs(s)+' overs</div><div class="score-rr">RR: '+rr(s)+'</div></div>'+
-      '</div>'+
-      extrasRow+
       targetBar+
       (S.freeHit?'<div class="freehit-banner">⚡ FREE HIT — batter cannot be out except run out</div>':'')+
       '<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+ballsHtml+'</div></div>'+
