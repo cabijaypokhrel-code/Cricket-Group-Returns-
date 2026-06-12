@@ -210,7 +210,7 @@ function _svgManhattan(overStats1, overStats2, teamName1, teamName2, fow1, fow2)
       var bh=Math.max(1,(r/maxR)*innerH);
       var y=pad.t+innerH-bh;
       var hasWkt=fow&&fow.some(function(f){
-        var ov=parseInt(f.over)||0; return ov===i+1;
+        var ov=parseInt(f.over)||0; return ov===i;
       });
       bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+
         '" fill="'+(hasWkt?'#e53935':color)+'" rx="1.5">'+

@@ -19,7 +19,7 @@ _applyStoredTheme();
   // Auto-restore in-progress match if available
   if(hasSavedProgress()){
     try{
-      var raw=localStorage.getItem('cricket_progress');
+      var raw=localStorage.getItem('cricket_progress_v2');
       var data=JSON.parse(raw);
       if(data&&data.S&&(data.S.phase==='scoring'||data.S.phase==='result')){
         Object.assign(S, data.S);

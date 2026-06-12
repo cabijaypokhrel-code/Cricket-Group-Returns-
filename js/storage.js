@@ -1,3 +1,21 @@
+var PROGRESS_KEY='cricket_progress_v2';
+var HISTORY_KEY='cricket_history_v2';
+
+/* Migrate v1 data to v2 keys if v2 doesn't exist yet */
+function _migrateStorage(){
+  try{
+    if(!localStorage.getItem(PROGRESS_KEY)){
+      var old=localStorage.getItem('cricket_progress');
+      if(old){ localStorage.setItem(PROGRESS_KEY,old); localStorage.removeItem('cricket_progress'); }
+    }
+    if(!localStorage.getItem(HISTORY_KEY)){
+      var oldH=localStorage.getItem('cricket_history');
+      if(oldH){ localStorage.setItem(HISTORY_KEY,oldH); localStorage.removeItem('cricket_history'); }
+    }
+  }catch(e){}
+}
+_migrateStorage();
+
 function _buildSaveData(){
   return {
     S: {
@@ -25,40 +43,35 @@ function _buildSaveData(){
 
 function autoSave(){
   if(S.phase!=='scoring' && S.phase!=='result') return;
-  try { localStorage.setItem('cricket_progress', JSON.stringify(_buildSaveData())); } catch(e){}
+  safeLocalSet(PROGRESS_KEY, _buildSaveData());
 }
 
 function saveProgress(){
-  try {
-    localStorage.setItem('cricket_progress', JSON.stringify(_buildSaveData()));
-    showToast('Progress saved ✓');
-  } catch(e){ showToast('Could not save — storage unavailable'); }
+  if(safeLocalSet(PROGRESS_KEY, _buildSaveData())) showToast('Progress saved ✓');
+  else showToast('Could not save — storage unavailable');
 }
 
 function loadProgress(){
-  try {
-    var raw = localStorage.getItem('cricket_progress');
-    if(!raw){ showToast('No saved progress found'); return; }
-    var data = JSON.parse(raw);
-    var saved = data.S;
-    Object.assign(S, saved);
-    S.snapshots = [];
-    showToast('Progress loaded ✓');
-    render();
-  } catch(e){ showToast('Could not load saved data'); }
+  var data=safeLocalGet(PROGRESS_KEY);
+  if(!data){ showToast('No saved progress found'); return; }
+  if(!data.S){ showToast('Saved data is corrupted'); safeLocalRemove(PROGRESS_KEY); return; }
+  Object.assign(S, data.S);
+  S.snapshots=[];
+  showToast('Progress loaded ✓');
+  render();
 }
 
 function clearProgress(){
-  localStorage.removeItem('cricket_progress');
+  safeLocalRemove(PROGRESS_KEY);
   showToast('Saved progress cleared');
 }
 
 function hasSavedProgress(){
-  try { return !!localStorage.getItem('cricket_progress'); } catch(e){ return false; }
+  try{ return !!localStorage.getItem(PROGRESS_KEY); } catch(e){ return false; }
 }
 
 function saveMatchToHistory(){
-  try {
+  try{
     var bat1=S.match.batFirst, bat2=bat1===S.match.team1?S.match.team2:S.match.team1;
     var s1=S.inn1score||S.t1, s2=S.t2;
     var result='';
@@ -71,43 +84,39 @@ function saveMatchToHistory(){
     var b2=S.innings===2||S.phase==='result'?S.batting:[];
     var bw2=S.innings===2||S.phase==='result'?S.bowling:[];
     var fow2=S.innings===2||S.phase==='result'?S.fow:[];
-    var entry = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString(),
-      team1: S.match.team1, team2: S.match.team2,
-      batFirst: bat1,
-      overs: S.match.overs,
-      inn1: {runs:s1.runs, wickets:s1.wickets, balls:s1.balls, wide:s1.wide||0, nb:s1.nb||0},
-      inn2: {runs:s2.runs, wickets:s2.wickets, balls:s2.balls, wide:s2.wide||0, nb:s2.nb||0},
-      result: result,
-      bat1players: orderedNames(b1, S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder),
-      bat2players: b2.length?orderedNames(b2, S.battingOrder):[],
-      inn1batting: JSON.parse(JSON.stringify(b1)),
-      inn1bowling: JSON.parse(JSON.stringify(bw1)),
-      inn1fow: JSON.parse(JSON.stringify(fow1)),
-      inn1battingOrder: (S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder).slice(),
-      inn1bowlingOrder: (S.inn1bowlingOrder.length?S.inn1bowlingOrder:S.bowlingOrder).slice(),
-      inn2batting: JSON.parse(JSON.stringify(b2)),
-      inn2bowling: JSON.parse(JSON.stringify(bw2)),
-      inn2fow: JSON.parse(JSON.stringify(fow2)),
-      inn2battingOrder: S.battingOrder.slice(),
-      inn2bowlingOrder: S.bowlingOrder.slice(),
-      inn1overHistory: JSON.parse(JSON.stringify(S.inn1overHistory||[])),
-      inn2overHistory: JSON.parse(JSON.stringify((S.innings===2||S.phase==='result')?S.overHistory:[])),
-      inn1fow2: JSON.parse(JSON.stringify(fow1)),
-      inn2fow2: JSON.parse(JSON.stringify(fow2))
+    var entry={
+      id:Date.now(),
+      date:new Date().toLocaleDateString(),
+      team1:S.match.team1, team2:S.match.team2,
+      batFirst:bat1,
+      overs:S.match.overs,
+      inn1:{runs:s1.runs,wickets:s1.wickets,balls:s1.balls,wide:s1.wide||0,nb:s1.nb||0,byes:s1.byes||0,lb:s1.lb||0},
+      inn2:{runs:s2.runs,wickets:s2.wickets,balls:s2.balls,wide:s2.wide||0,nb:s2.nb||0,byes:s2.byes||0,lb:s2.lb||0},
+      result:result,
+      bat1players:orderedNames(b1, S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder),
+      bat2players:b2.length?orderedNames(b2,S.battingOrder):[],
+      inn1batting:JSON.parse(JSON.stringify(b1)),
+      inn1bowling:JSON.parse(JSON.stringify(bw1)),
+      inn1fow:JSON.parse(JSON.stringify(fow1)),
+      inn1battingOrder:(S.inn1battingOrder.length?S.inn1battingOrder:S.battingOrder).slice(),
+      inn1bowlingOrder:(S.inn1bowlingOrder.length?S.inn1bowlingOrder:S.bowlingOrder).slice(),
+      inn2batting:JSON.parse(JSON.stringify(b2)),
+      inn2bowling:JSON.parse(JSON.stringify(bw2)),
+      inn2fow:JSON.parse(JSON.stringify(fow2)),
+      inn2battingOrder:S.battingOrder.slice(),
+      inn2bowlingOrder:S.bowlingOrder.slice(),
+      inn1overHistory:JSON.parse(JSON.stringify(S.inn1overHistory||[])),
+      inn2overHistory:JSON.parse(JSON.stringify((S.innings===2||S.phase==='result')?S.overHistory:[])),
+      inn1overBowlers:(S.inn1overBowlers||[]).slice(),
+      inn2overBowlers:(S.innings===2||S.phase==='result'?S.overBowlers:[]).slice()
     };
-    var history = getMatchHistory();
+    var history=getMatchHistory();
     history.unshift(entry);
-    if(history.length>10) history=history.slice(0,10);
-    localStorage.setItem('cricket_history', JSON.stringify(history));
-  } catch(e){}
+    if(history.length>20) history=history.slice(0,20);
+    safeLocalSet(HISTORY_KEY, history);
+  }catch(e){}
 }
 
 function getMatchHistory(){
-  try {
-    var raw=localStorage.getItem('cricket_history');
-    return raw?JSON.parse(raw):[];
-  } catch(e){ return []; }
+  return safeLocalGet(HISTORY_KEY, []);
 }
-

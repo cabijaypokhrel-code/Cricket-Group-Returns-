@@ -115,7 +115,7 @@ function _resetMatchState(){
   S.overBowlers=[];
   S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.confirmEndInnings=false;
   S.inn1Complete=false; S.freeHit=false; S.overSummary=null; S._autoRestored=false;
-  try{ localStorage.removeItem('cricket_progress'); }catch(e){}
+  try{ localStorage.removeItem('cricket_progress_v2'); }catch(e){}
 }
 
 function resetMatch(){
