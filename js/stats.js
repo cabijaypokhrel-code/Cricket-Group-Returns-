@@ -203,22 +203,25 @@ function _svgManhattan(overStats1, overStats2, teamName1, teamName2, fow1, fow2)
   }
   /* bars */
   var bars='';
-  function drawBar(runs, idxArr, color, fow, offset){
-    idxArr.forEach(function(r,i){
+  function drawBar(runs, color, fow, offset){
+    runs.forEach(function(r,i){
       var slotW=innerW/n;
       var x=pad.l+i*slotW+offset;
       var bh=Math.max(1,(r/maxR)*innerH);
       var y=pad.t+innerH-bh;
       var hasWkt=fow&&fow.some(function(f){
-        var ov=parseInt(f.over)||0; return ov===i+1||ov===i;
+        var ov=parseInt(f.over)||0; return ov===i+1;
       });
       bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+
         '" fill="'+(hasWkt?'#e53935':color)+'" rx="1.5">'+
         '<title>Over '+(i+1)+': '+r+'r'+(hasWkt?' W':'')+' ('+teamName1+')</title></rect>';
     });
   }
-  drawBar(runs1, runs1, '#0e8f6f', fow1, (innerW/n-bw*2-gap)/2);
-  if(runs2.length) drawBar(runs2, runs2, '#2563eb', fow2, (innerW/n-bw*2-gap)/2+bw+gap);
+  /* single innings: center the bar; two innings: side by side */
+  var singleOffset=(innerW/Math.max(n,1)-bw)/2;
+  var pairOffset=(innerW/Math.max(n,1)-bw*2-gap)/2;
+  drawBar(runs1, '#0e8f6f', fow1, runs2.length?pairOffset:singleOffset);
+  if(runs2.length) drawBar(runs2, '#2563eb', fow2, pairOffset+bw+gap);
   /* x labels every 5 */
   var xLabels='';
   for(var xi=0;xi<n;xi++){

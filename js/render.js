@@ -280,7 +280,7 @@ function renderScoring(){
         '</span>'+
       '</div>'+
       targetBar+
-      (S.freeHit?'<div class="freehit-banner">⚡ FREE HIT — batter cannot be out except run out</div>':'')+
+      (S.freeHit?'<div class="freehit-banner">⚡ FREE HIT</div>':'')+
       '<div class="this-over"><div class="over-label">This over</div><div class="over-balls">'+ballsHtml+'</div></div>'+
     '</div>';
 
@@ -387,7 +387,7 @@ function renderScoring(){
     var canConfirm = dt && dt!=='';
     html+=
       '<div class="modal-box modal-red">'+
-        (S.freeHit?'<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:700;color:#6d28d9">⚡ FREE HIT — only Run Out is valid</div>':'')+
+        (S.freeHit?'<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:6px 12px;margin-bottom:10px;font-size:13px;font-weight:800;color:#6d28d9;text-align:center">⚡ FREE HIT</div>':'')+
         '<div class="modal-title-red">&#128308; How was '+bname+' dismissed?</div>'+
         '<div class="dism-grid">'+typeGrid+'</div>'+
         detailHtml+
