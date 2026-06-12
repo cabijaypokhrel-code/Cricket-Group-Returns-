@@ -623,13 +623,21 @@ function renderScoring(){
       '</div>';
   }
 
-  var tabNames={live:'Live',batting:'Batting',bowling:'Bowling',fow:'FoW',overs:'Overs'};
+  var tabNames={live:'Live',batting:'Batting',bowling:'Bowling',fow:'FoW',overs:'Overs',stats:'📊 Stats'};
   var tabsHtml='<div class="tabs">';
-  ['live','batting','bowling','fow','overs'].forEach(function(t){
+  ['live','batting','bowling','fow','overs','stats'].forEach(function(t){
     tabsHtml+='<div class="tab'+(S.activeTab===t?' active':'')+'" data-action="tab" data-val="'+t+'">'+tabNames[t]+'</div>';
   });
   tabsHtml+='</div>';
   html+=tabsHtml;
+
+  if(S.activeTab==='stats'){
+    html+='<div id="stats-panel"></div>';
+    document.getElementById('main-content').innerHTML=html;
+    S._statsTab=S._statsTab||'summary';
+    renderStats(document.getElementById('stats-panel'));
+    return;
+  }
 
   if(S.activeTab==='live'){
     html+=
@@ -941,8 +949,8 @@ function renderResult(){
     '</div>'+
 
     '<div class="tabs" id="result-tabs" style="overflow-x:auto;white-space:nowrap;display:flex;scrollbar-width:none">'+
-      ['inn1bat','inn1bowl','inn2bat','inn2bowl','analysis'].map(function(t,i){
-        var labels=['1st Bat','1st Bowl','2nd Bat','2nd Bowl','📊 Charts'];
+      ['inn1bat','inn1bowl','inn2bat','inn2bowl','analysis','stats'].map(function(t,i){
+        var labels=['1st Bat','1st Bowl','2nd Bat','2nd Bowl','Charts','📊 Stats'];
         return '<div class="tab'+(i===0?' active':'')+'" style="flex-shrink:0" data-action="result-tab" data-val="'+t+'">'+labels[i]+'</div>';
       }).join('')+
     '</div>'+
@@ -964,6 +972,7 @@ function renderResult(){
     inn2bat:'<div class="section-title">'+bw+' — Batting</div>'+makeBatTable(S.batting,S.battingOrder,s2)+(makeFow(S.fow)?'<div class="section-title" style="margin-top:8px">Fall of Wickets</div>'+makeFow(S.fow):''),
     inn2bowl:'<div class="section-title">'+bt+' — Bowling (Inn. 2)</div>'+makeBowlTable(S.bowling,S.bowlingOrder),
     analysis: buildAnalysisHTML(S.match,s1,s2,oh1,oh2,S.inn1fow,S.fow),
+    stats: '__stats__',
   };
   document.getElementById('main-content').innerHTML=html;
 }
@@ -980,7 +989,15 @@ document.addEventListener('click', function(e){
     document.querySelectorAll('#result-tabs .tab').forEach(function(t){ t.classList.remove('active'); });
     el.classList.add('active');
     var tc=document.getElementById('result-tab-content');
-    if(tc && S._resultTabs) tc.innerHTML=S._resultTabs[val]||'';
+    if(!tc||!S._resultTabs) return;
+    if(val==='stats'){ S._statsTab='summary'; renderStats(); }
+    else { tc.innerHTML=S._resultTabs[val]||''; }
+    return;
+  }
+  if(action==='stats-tab'){
+    S._statsTab=val;
+    var sp=document.getElementById('stats-panel');
+    renderStats(sp||undefined);
     return;
   }
   /* overs quick-pick */
