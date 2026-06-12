@@ -1,7 +1,7 @@
 function headerHome(){
   if(S.phase==='scoring'){
     if(!confirm('Leave the current match? The match will be discarded.')) return;
-    try{ localStorage.removeItem('cricket_progress'); }catch(e){}
+    try{ localStorage.removeItem('cricket_progress_v2'); }catch(e){}
     S._autoRestored=false;
   }
   LIVE._matchEnded=true; // stop any live reconnect loops
