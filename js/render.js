@@ -1,5 +1,13 @@
 /* render.js — all screen rendering + delegated click handler */
 
+function _wrapPad(fn){
+  fn();
+  var mc=document.getElementById('main-content');
+  if(mc && !mc.querySelector('.scoring-panel') && !mc.querySelector('.page-pad')){
+    mc.innerHTML='<div class="page-pad">'+mc.innerHTML+'</div>';
+  }
+}
+
 function render(){
   var t1=S.match.team1, t2=S.match.team2;
   var logoEl=document.getElementById('header-logo');
@@ -9,13 +17,13 @@ function render(){
   setTitle('🏏 '+(t1&&t2?t1+' vs '+t2:'Saturday Cricket Team'));
   if(S.phase==='history'){
     document.getElementById('match-subtitle').textContent='Match History';
-    renderHistory();
+    _wrapPad(renderHistory);
   } else if(S.phase==='setup'){
     document.getElementById('match-subtitle').textContent='Set up a new match to begin';
-    renderSetup();
+    _wrapPad(renderSetup);
   } else if(S.phase==='scoring' && S.inn1Complete){
     document.getElementById('match-subtitle').textContent='1st Innings Complete';
-    renderInn1Complete();
+    _wrapPad(renderInn1Complete);
   } else if(S.phase==='scoring'){
     var bt=S.match.batFirst, bw=bt===t1?t2:t1;
     var batting=S.innings===1?bt:bw;
@@ -31,7 +39,7 @@ function render(){
     renderScoring();
   } else {
     document.getElementById('match-subtitle').textContent='Match complete';
-    renderResult();
+    _wrapPad(renderResult);
   }
   if(S.phase==='scoring'||S.phase==='result') updateShareHash();
   _updateHomeBtn();

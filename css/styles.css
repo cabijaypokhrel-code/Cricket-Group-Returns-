@@ -123,9 +123,13 @@ input, select { font-family: inherit; }
 }
 
 #main-content {
-  padding: 16px;
+  padding: 0;
   background: var(--c-bg);
   min-height: calc(100vh - 72px);
+}
+/* Pages that aren't the scoring screen get standard padding */
+#main-content .page-pad {
+  padding: 16px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -369,9 +373,10 @@ input, select { font-family: inherit; }
 /* ── Scoreboard ── */
 .scoreboard {
   background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+  border-radius: 0;
+  padding: 14px 16px;
   margin-bottom: 12px;
   box-shadow: var(--shadow-md);
 }
@@ -611,9 +616,9 @@ input, select { font-family: inherit; }
 /* ── Scoring panel & run buttons ── */
 .scoring-panel {
   background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+  border-top: 1px solid var(--c-border);
+  border-radius: 0;
+  padding: 14px 16px;
   margin-bottom: 12px;
   box-shadow: var(--shadow-md);
 }
@@ -834,10 +839,16 @@ input, select { font-family: inherit; }
    ═══════════════════════════════════════════════════════════════════════ */
 .card {
   background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+  border-radius: 0;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+/* inside page-pad (setup/history/result) cards get rounded corners back */
+.page-pad .card {
   border: 1px solid var(--c-border);
   border-radius: var(--radius-lg);
-  padding: 16px;
-  margin-bottom: 12px;
   box-shadow: var(--shadow-sm);
 }
 
