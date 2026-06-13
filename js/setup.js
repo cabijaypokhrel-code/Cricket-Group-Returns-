@@ -28,8 +28,24 @@ function confirmBowler(){
   var name=inp?inp.value.trim():'';
   if(!name) return;
   var idx=-1;
+  // Check if this name already exists in the bowling array
   for(var i=0;i<S.bowling.length;i++){ if(S.bowling[i].name===name){ idx=i; break; } }
-  if(idx===-1){ S.bowling.push({name:name,overs:0,balls:0,runs:0,wickets:0}); idx=S.bowling.length-1; }
+  if(idx===-1){
+    // Name not found — reuse the first unused slot (0 balls bowled, not current bowler)
+    // This prevents placeholder slots ("Team 2 P3" etc.) from staying and creating 15+ players
+    var unused=-1;
+    for(var i=0;i<S.bowling.length;i++){
+      if(S.bowling[i].balls===0 && i!==S.bowlerIdx){ unused=i; break; }
+    }
+    if(unused>=0){
+      S.bowling[unused].name=name;
+      idx=unused;
+    } else {
+      // All 11 slots have bowled — allow a substitute beyond the XI
+      S.bowling.push({name:name,overs:0,balls:0,runs:0,wickets:0});
+      idx=S.bowling.length-1;
+    }
+  }
   if(S.bowlingOrder.indexOf(idx)<0) S.bowlingOrder.push(idx);
   S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; S.overSummary=null; render();
 }
