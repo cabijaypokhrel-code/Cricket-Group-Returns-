@@ -431,6 +431,23 @@ function renderScoring(){
           '<button class="btn-primary" style="width:auto;padding:10px 14px;margin:0;font-size:13px" data-action="confirm-batsman">&#10003;</button>'+
         '</div>'+
       '</div>';
+  } else if(S.openersNeeded){
+    var pickedStrikerIdx = S.battingOrder.length>0 ? S.battingOrder[0] : -1;
+    var needStriker = pickedStrikerIdx<0;
+    var openerChips = S.batting.map(function(b,i){
+      if(i===pickedStrikerIdx) return null;
+      return '<button class="bowler-chip bowler-chip-fresh" data-action="pick-opener" data-val="'+i+'">'+
+        '<span class="chip-name">'+b.name+'</span>'+
+        '<span class="chip-stat">'+(needStriker?'tap to open':'tap to pair')+'</span>'+
+      '</button>';
+    }).filter(Boolean).join('');
+    html+=
+      '<div class="modal-box modal-blue">'+
+        '<div class="modal-title-blue">&#127951; '+(needStriker?'Who opens batting? Pick Striker':'Now pick the Non-Striker')+'</div>'+
+        (pickedStrikerIdx>=0?'<div class="chip-label" style="color:#0F6E56;margin-bottom:6px">&#11088; Striker: <strong>'+S.batting[pickedStrikerIdx].name+'</strong></div>':'')+
+        '<div class="chip-label" style="margin-bottom:6px">'+(needStriker?'Select who faces the first ball':'Select the other opener')+'</div>'+
+        '<div class="bowler-chip-grid">'+openerChips+'</div>'+
+      '</div>';
   } else if(S.overSummary && S.overDone && !S.bowlerConfirmed){
     // Over summary shown between over end and new bowler pick
     var os=S.overSummary;
@@ -1113,6 +1130,7 @@ document.addEventListener('click', function(e){
     case 'pick-bowler-edit':  pickBowler(parseInt(val)); break;
     case 'confirm-bowler':    confirmBowler(); break;
     case 'confirm-batsman':   confirmNewBatsman(); break;
+    case 'pick-opener':       pickOpener(parseInt(val)); break;
     case 'pick-batsman':      pickBatsman(parseInt(val)); break;
     case 'set-dismissal':     S.dismissalType=val; render(); break;
     case 'confirm-dismissal': confirmDismissal(S.dismissalType); break;

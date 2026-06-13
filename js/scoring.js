@@ -226,7 +226,8 @@ function startInn2(){
   S.batting  = newBatters;
   S.bowling  = newBowlers;
   S.strikerIdx=0; S.nonStrikerIdx=1; S.bowlerIdx=0;
-  S.battingOrder=[0,1]; S.bowlingOrder=[];
+  S.battingOrder=[]; S.bowlingOrder=[];
+  S.openersNeeded=true;
   S.thisBalls=[]; S.overHistory=[]; S.overBowlers=[]; S.fow=[]; S.partnershipBreaks=[];
   S.partnershipRuns=0; S.partnershipBalls=0;
   S.wicketPending=false; S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null;
