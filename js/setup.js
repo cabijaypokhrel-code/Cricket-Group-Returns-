@@ -8,8 +8,9 @@ function confirmNewBatsman(){
   for(var i=0;i<S.batting.length;i++){
     if(!S.batting[i].out && !S.batting[i].retiredHurt && i!==S.strikerIdx && i!==S.nonStrikerIdx){ nextIdx=i; break; }
   }
-  // Push new player if no slot available
+  // Push new player if no slot available (hard cap: max 12 per team)
   if(nextIdx===-1){
+    if(S.batting.length>=12) return;
     S.batting.push({name:name,runs:0,balls:0,fours:0,sixes:0,out:false,howOut:''});
     nextIdx=S.batting.length-1;
   } else {
@@ -40,10 +41,12 @@ function confirmBowler(){
     if(unused>=0){
       S.bowling[unused].name=name;
       idx=unused;
-    } else {
-      // All 11 slots have bowled — allow a substitute beyond the XI
+    } else if(S.bowling.length<12){
+      // All 11 slots have bowled — allow one substitute (hard cap: max 12)
       S.bowling.push({name:name,overs:0,balls:0,runs:0,wickets:0});
       idx=S.bowling.length-1;
+    } else {
+      return; // team is full at 12
     }
   }
   if(S.bowlingOrder.indexOf(idx)<0) S.bowlingOrder.push(idx);
