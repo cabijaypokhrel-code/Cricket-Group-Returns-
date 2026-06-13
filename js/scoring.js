@@ -92,6 +92,20 @@ function doWicket(){
 
 function confirmDismissal(type){
   // Called after user selects dismissal type and fills details
+  // Register a fielder name into an unused bowling slot so they appear
+  // as a named batsman in innings 2
+  function registerFielder(name){
+    if(!name) return;
+    for(var fi=0;fi<S.bowling.length;fi++){
+      if(S.bowling[fi].name===name) return; // already in roster
+    }
+    for(var fi=0;fi<S.bowling.length;fi++){
+      if(S.bowling[fi].balls===0 && fi!==S.bowlerIdx){
+        S.bowling[fi].name=name; return; // claim first unused slot
+      }
+    }
+    // all 11 slots used — fielder already captured in howOut text
+  }
   saveSnapshot();
   var s=sc(), b=bat(), w=bowl();
   var howOut='';
@@ -101,6 +115,7 @@ function confirmDismissal(type){
   } else if(type==='caught'){
     var catcher=document.getElementById('inp-catcher')?document.getElementById('inp-catcher').value.trim():'';
     if(!catcher){ alert('Enter catcher name'); return; }
+    registerFielder(catcher);
     howOut='c '+catcher+' b '+w.name;
     w.wickets++;
   } else if(type==='lbw'){
@@ -109,12 +124,14 @@ function confirmDismissal(type){
   } else if(type==='stumped'){
     var wk=document.getElementById('inp-wk')?document.getElementById('inp-wk').value.trim():'';
     if(!wk){ alert('Enter wicketkeeper name'); return; }
+    registerFielder(wk);
     howOut='st '+wk+' b '+w.name;
     w.wickets++;
   } else if(type==='runout'){
     var f1=document.getElementById('inp-f1')?document.getElementById('inp-f1').value.trim():'';
     var f2=document.getElementById('inp-f2')?document.getElementById('inp-f2').value.trim():'';
     if(!f1){ alert('Enter at least one fielder name'); return; }
+    registerFielder(f1); registerFielder(f2);
     var roRuns=parseInt((document.getElementById('inp-ro-runs')||{}).value)||0;
     var roWho=((document.getElementById('inp-ro-who')||{}).value)||'striker';
     var roOutIdx=(roWho==='nonstriker')?S.nonStrikerIdx:S.strikerIdx;
