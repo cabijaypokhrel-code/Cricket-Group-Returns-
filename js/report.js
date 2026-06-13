@@ -522,19 +522,28 @@ var _pdfHtml='';
 
 function _doPrint(){
   if(!_pdfHtml) return;
-  var iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
-  document.body.appendChild(iframe);
-  var doc=iframe.contentDocument||iframe.contentWindow.document;
-  doc.open();
-  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Match Report</title>'+
-    '<style>'+_PDF_CSS+'</style></head><body><div class="page">'+_pdfHtml+'</div></body></html>');
-  doc.close();
-  setTimeout(function(){
-    try{ iframe.contentWindow.focus(); iframe.contentWindow.print(); }
-    catch(e){ window.print(); }
-    setTimeout(function(){ if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 2000);
-  }, 500);
+  var fullHtml='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>Match Report</title><style>'+_PDF_CSS+'</style></head>'+
+    '<body><div class="page">'+_pdfHtml+'</div></body></html>';
+  // Open in new tab — reliable on mobile; user can use browser's Print → Save as PDF
+  var win=window.open('','_blank');
+  if(win){
+    win.document.write(fullHtml);
+    win.document.close();
+    setTimeout(function(){ try{ win.focus(); win.print(); }catch(e){} }, 600);
+  } else {
+    // Popup blocked — download as an HTML file instead
+    try{
+      var blob=new Blob([fullHtml],{type:'text/html'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url; a.download='match-report.html';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    }catch(e){ window.print(); }
+  }
 }
 
 function printOverlay(html){
@@ -548,7 +557,7 @@ function printOverlay(html){
   overlay.innerHTML=
     '<div id="pdf-overlay-bar">'+
       '<button id="pdf-close-btn" onclick="document.getElementById(\'pdf-overlay\').style.display=\'none\';_pdfHtml=\'\';">&#8592; Back</button>'+
-      '<button id="pdf-print-btn" onclick="_doPrint()">&#128438; Print / Save PDF</button>'+
+      '<button id="pdf-print-btn" onclick="_doPrint()">&#128438; Download / Print PDF</button>'+
     '</div>'+
     '<div id="pdf-overlay-body"><style>'+_PDF_CSS+'</style>'+html+'</div>';
   overlay.style.display='block';
