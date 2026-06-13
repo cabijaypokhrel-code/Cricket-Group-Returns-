@@ -1155,9 +1155,11 @@ document.addEventListener('click', function(e){
       var hist=getMatchHistory(), m=hist[parseInt(val)];
       if(m){
         var setup=S._pendingSetup||{t1:S.match.team1,t2:S.match.team2,overs:S.match.overs,batFirst:S.match.batFirst};
-        var op1=m.batFirst===m.team1?m.inn1batting.map(function(b){return b.name;}):m.inn1bowling.map(function(b){return b.name;});
-        var op2=m.batFirst===m.team1?m.inn1bowling.map(function(b){return b.name;}):m.inn1batting.map(function(b){return b.name;});
-        applyTeamSetup(setup, op1, op2);
+        // Assign players to T1/T2 based on previous match team names; cap at 11 per team
+        var op1=(m.batFirst===m.team1?m.inn1batting:m.inn1bowling).map(function(b){return b.name;}).slice(0,11);
+        var op2=(m.batFirst===m.team1?m.inn1bowling:m.inn1batting).map(function(b){return b.name;}).slice(0,11);
+        // Show bat-first choice rather than jumping straight into the match
+        renderBatFirstChoice(setup, op1, op2, m.team1+' vs '+m.team2+' ('+m.date+')');
       }
       break;
     case 'print-history':     printHistoryMatch(parseInt(val)); break;
@@ -1177,8 +1179,8 @@ document.addEventListener('click', function(e){
       var hm=getMatchHistory()[parsed.idx];
       if(hm){
         var ps=parsed.setup;
-        var pp1=hm.batFirst===hm.team1?hm.inn1batting.map(function(b){return b.name;}):hm.inn1bowling.map(function(b){return b.name;});
-        var pp2=hm.batFirst===hm.team1?hm.inn1bowling.map(function(b){return b.name;}):hm.inn1batting.map(function(b){return b.name;});
+        var pp1=(hm.batFirst===hm.team1?hm.inn1batting:hm.inn1bowling).map(function(b){return b.name;}).slice(0,11);
+        var pp2=(hm.batFirst===hm.team1?hm.inn1bowling:hm.inn1batting).map(function(b){return b.name;}).slice(0,11);
         renderChoosePlayers(Object.assign({},ps,{p1:pp1,p2:pp2}));
       }
       break;
