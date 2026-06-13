@@ -506,6 +506,8 @@ function renderScoring(){
     if(S.editStriker){
       var allBatChips = S.batting.map(function(b,i){
         if(b.out) return null;
+        // Only show players who are currently at the crease or have already batted
+        if(S.battingOrder.indexOf(i)<0) return null;
         return '<button class="bowler-chip" style="border-color:#9FE1CB;background:#E1F5EE;margin-bottom:2px" data-action="pick-striker" data-val="'+i+'">'+
           '<span class="chip-name">'+b.name+'</span>'+
           '<span class="chip-stat">'+(b.balls>0?b.runs+'r ('+b.balls+'b)':'yet to bat')+'</span>'+
@@ -665,10 +667,17 @@ function renderScoring(){
   } else if(S.activeTab==='batting'){
     var active=[S.strikerIdx,S.nonStrikerIdx];
     function makeBatRows(arr, activeIdxs, strikerI, nonStrikerI, orderArr){
-      var order=orderArr||[];
+      var order=(orderArr||[]).slice();
       var notBatted=[];
       for(var ii=0;ii<arr.length;ii++){
-        if(order.indexOf(ii)<0) notBatted.push(ii);
+        if(order.indexOf(ii)<0){
+          // If player has any batting activity, slot them after the tracked order but before true dnb
+          if(arr[ii].balls>0||arr[ii].retiredHurt||arr[ii].out||ii===strikerI||ii===nonStrikerI){
+            order=order.concat([ii]);
+          } else {
+            notBatted.push(ii);
+          }
+        }
       }
       var sortedIdxs=order.concat(notBatted);
       return sortedIdxs.map(function(i){

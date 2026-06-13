@@ -44,6 +44,7 @@ function pickStriker(idx){
     // swap if they pick the non-striker
     swap();
   } else {
+    if(S.battingOrder.indexOf(idx)<0) S.battingOrder.push(idx);
     S.strikerIdx=idx;
   }
   S.editStriker=false; render();
