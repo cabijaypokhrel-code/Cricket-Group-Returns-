@@ -39,6 +39,21 @@ function pickBowler(idx){
   S.bowlerIdx=idx; S.overDone=false; S.bowlerConfirmed=true; S.overSummary=null; render();
 }
 
+function pickOpener(idx){
+  if(S.battingOrder.length===0){
+    // First pick: this player is the striker (faces first ball)
+    S.strikerIdx=idx;
+    S.battingOrder=[idx];
+    render();
+  } else if(idx!==S.strikerIdx){
+    // Second pick: non-striker (other opener)
+    S.nonStrikerIdx=idx;
+    S.battingOrder.push(idx);
+    S.openersNeeded=false;
+    render();
+  }
+}
+
 function pickStriker(idx){
   if(idx===S.nonStrikerIdx){
     // swap if they pick the non-striker
@@ -115,7 +130,7 @@ function _resetMatchState(){
   S.bowlingOrder=[]; S.inn1bowlingOrder=[];
   S.overBowlers=[];
   S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.confirmEndInnings=false;
-  S.inn1Complete=false; S.freeHit=false; S.overSummary=null; S._autoRestored=false;
+  S.inn1Complete=false; S.freeHit=false; S.overSummary=null; S._autoRestored=false; S.openersNeeded=false;
   try{ localStorage.removeItem('cricket_progress_v2'); }catch(e){}
 }
 
@@ -175,7 +190,8 @@ function applyTeamSetup(teamSetup, p1override, p2override){
   var wPlayers=batTeam===t1?p2:p1;
   S.batting=bPlayers.map(function(n){ return {name:n,runs:0,balls:0,fours:0,sixes:0,out:false,howOut:''}; });
   S.bowling=wPlayers.map(function(n){ return {name:n,overs:0,balls:0,runs:0,wickets:0}; });
-  S.battingOrder=[0,1]; S.bowlingOrder=[];
+  S.battingOrder=[]; S.bowlingOrder=[];
+  S.openersNeeded=true;
   S.phase='scoring'; render();
 }
 

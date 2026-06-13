@@ -25,7 +25,8 @@ var S = {
   freeHit:false,
   overSummary:null,
   prefillPlayers:null,
-  choosePlayersPhase:false
+  choosePlayersPhase:false,
+  openersNeeded:false
 };
 
 function saveSnapshot(){
