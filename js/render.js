@@ -175,6 +175,15 @@ function renderPlayerChoice(){
   document.getElementById('main-content').innerHTML=html;
 }
 
+/* Focus an input and pre-select its text so the current name can be
+   overwritten directly, without first clearing it by hand. */
+function focusSelect(id){
+  setTimeout(function(){
+    var el=document.getElementById(id);
+    if(el){ el.focus(); el.select(); }
+  },0);
+}
+
 function _wizardHeader(title, sub){
   return '<div class="wizard-header">'+
     '<div class="wizard-title">'+title+'</div>'+
@@ -1119,11 +1128,11 @@ document.addEventListener('click', function(e){
     case 'cancel-extras':     S.extrasPanel=null; render(); break;
     case 'undo':              undoLast(); break;
     case 'swap-batters':      swap(); render(); break;
-    case 'edit-striker':      S.editStriker=true; render(); break;
+    case 'edit-striker':      S.editStriker=true; render(); focusSelect('striker-edit-inp'); break;
     case 'cancel-edit-striker': S.editStriker=false; render(); break;
     case 'save-striker':      saveStrikerName(); break;
     case 'pick-striker':      pickStriker(parseInt(val)); break;
-    case 'edit-bowler':       S.editBowler=true; render(); break;
+    case 'edit-bowler':       S.editBowler=true; render(); focusSelect('bowler-edit-inp'); break;
     case 'cancel-edit-bowler':S.editBowler=false; render(); break;
     case 'save-bowler':       saveBowlerName(); break;
     case 'pick-bowler':       pickBowler(parseInt(val)); break;
