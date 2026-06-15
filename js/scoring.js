@@ -148,7 +148,7 @@ function confirmDismissal(type){
     s.wickets++;
     S.fow.push({score:s.runs,wkts:s.wickets,name:roOb.name,over:overs(s)});
     S.thisBalls.push(roBallEntry);
-    s.balls++; w.balls++;
+    s.balls++; w.balls++; bat().balls++;
     S.dismissalPending=false; S.dismissalType='';
     if(s.wickets>=10){ endInnings(); return; }
     S.wicketPending=true; S.outIdx=roOutIdx;
@@ -176,7 +176,7 @@ function confirmDismissal(type){
     S.dismissalPending=false; S.dismissalType='';
     S.wicketPending=true; S.outIdx=S.strikerIdx;
     S.thisBalls.push('W');
-    s.balls++; w.balls++;
+    s.balls++; w.balls++; rb2.balls++;
     if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
     render(); return;
   }
@@ -184,7 +184,7 @@ function confirmDismissal(type){
   s.wickets++;
   S.fow.push({score:s.runs,wkts:s.wickets,name:b.name,over:overs(s)});
   S.thisBalls.push('W');
-  s.balls++; w.balls++;
+  s.balls++; w.balls++; b.balls++;
   S.dismissalPending=false; S.dismissalType='';
   S.partnershipRuns=0; S.partnershipBalls=0;
   // Hat-trick check for bowler
