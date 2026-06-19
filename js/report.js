@@ -218,44 +218,6 @@ function _chartRunRate(oh1, oh2, name1, name2, totalOvers, s1){
     '</svg>';
 }
 
-/* ── Chart 4: Wickets Timeline (horizontal scatter) ──────────────── */
-function _chartWicketsTimeline(fow1, fow2, s1, s2, name1, name2){
-  var all=(fow1||[]).concat(fow2||[]);
-  if(!all.length) return '';
-  var W=520, H=90, pad={t:20,r:16,b:28,l:12};
-  var innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
-  var maxR=Math.max(s1.runs, s2.runs, 1);
-  function px(r){ return (pad.l+(r/maxR)*innerW).toFixed(2); }
-  function row1y(){ return (pad.t+innerH*0.25).toFixed(2); }
-  function row2y(){ return (pad.t+innerH*0.75).toFixed(2); }
-  var c1='#1565c0', c2='#2e7d32';
-
-  var dots1=(fow1||[]).map(function(f){
-    return '<circle cx="'+px(f.score)+'" cy="'+row1y()+'" r="5" fill="'+c1+'" opacity="0.85">'+
-      '<title>'+escapeHtml(f.name)+' '+f.score+'/'+f.wkts+'</title></circle>'+
-      '<text x="'+px(f.score)+'" y="'+(parseFloat(row1y())-8)+'" text-anchor="middle" font-size="7" fill="'+c1+'">'+f.wkts+'</text>';
-  }).join('');
-  var dots2=(fow2||[]).map(function(f){
-    return '<circle cx="'+px(f.score)+'" cy="'+row2y()+'" r="5" fill="'+c2+'" opacity="0.85">'+
-      '<title>'+escapeHtml(f.name)+' '+f.score+'/'+f.wkts+'</title></circle>'+
-      '<text x="'+px(f.score)+'" y="'+(parseFloat(row2y())+14)+'" text-anchor="middle" font-size="7" fill="'+c2+'">'+f.wkts+'</text>';
-  }).join('');
-
-  var xLabels='';
-  var step=Math.ceil(maxR/6/10)*10||10;
-  for(var v=0;v<=maxR;v+=step){
-    xLabels+='<text x="'+px(v)+'" y="'+(H-2)+'" text-anchor="middle" font-size="8" fill="#888">'+v+'</text>'+
-      '<line x1="'+px(v)+'" y1="'+pad.t+'" x2="'+px(v)+'" y2="'+(H-pad.b)+'" stroke="#f0f0f0" stroke-width="0.8"/>';
-  }
-  var labels='<text x="'+(pad.l+2)+'" y="'+(parseFloat(row1y())+4)+'" font-size="8" font-weight="700" fill="'+c1+'">'+escapeHtml(name1)+'</text>'+
-    (fow2&&fow2.length?'<text x="'+(pad.l+2)+'" y="'+(parseFloat(row2y())+4)+'" font-size="8" font-weight="700" fill="'+c2+'">'+escapeHtml(name2)+'</text>':'');
-  var lines='<line x1="'+pad.l+'" y1="'+row1y()+'" x2="'+(W-pad.r)+'" y2="'+row1y()+'" stroke="#e0e0e0" stroke-width="1"/>'+
-    (fow2&&fow2.length?'<line x1="'+pad.l+'" y1="'+row2y()+'" x2="'+(W-pad.r)+'" y2="'+row2y()+'" stroke="#e0e0e0" stroke-width="1"/>':'');
-  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:520px">'+
-    xLabels+lines+dots1+dots2+labels+
-    '</svg>';
-}
-
 /* ── Chart 5: Batter Contribution (horizontal bars) ──────────────── */
 function _chartBatterContrib(batting, order, teamName, color){
   var idxs=order.slice();
