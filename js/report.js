@@ -347,29 +347,38 @@ function _chartExtras(s1, s2, name1, name2){
     '</svg>';
 }
 
-/* ── Chart 8: Partnerships (horizontal bars) ─────────────────────── */
-function _chartPartnerships(fow, batting, order, totalRuns, color){
-  if(!fow||!fow.length) return '';
-  var parts=[], prevScore=0;
-  for(var i=0;i<fow.length;i++){
-    parts.push({wkt:fow[i].wkts, runs:fow[i].score-prevScore, out:fow[i].name, score:fow[i].score});
-    prevScore=fow[i].score;
-  }
-  if(totalRuns>prevScore) parts.push({wkt:fow.length+1, runs:totalRuns-prevScore, out:'', score:totalRuns});
+/* ── Chart 8: Partnerships (back-to-back contribution bars) ───────────
+   Each row = one partnership: both batsmen, their individual run
+   contributions, and the partnership total — split from a centre line
+   so the larger contributor's bar is longer. */
+function _ordinal(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+
+function _chartPartnerships(partnerships, color1, color2){
+  var parts=(partnerships||[]).filter(function(p){ return p && p.runs>0; });
   if(!parts.length) return '';
-  var maxR=Math.max.apply(null,parts.map(function(p){return p.runs;}).concat([1]));
-  var barH=12, gap=3, W=420, padL=40, padR=50, padT=6, padB=6;
-  var H=padT+parts.length*(barH+gap)+padB;
-  var innerW=W-padL-padR;
-  var bars=parts.map(function(p,i){
-    var bw=Math.max(2,(p.runs/maxR)*innerW);
-    var y=padT+i*(barH+gap);
-    var label='Wkt '+p.wkt;
-    return '<text x="'+(padL-5)+'" y="'+(y+barH-2)+'" text-anchor="end" font-size="8" fill="#555">'+label+'</text>'+
-      '<rect x="'+padL+'" y="'+y+'" width="'+bw.toFixed(1)+'" height="'+barH+'" fill="'+color+'" rx="2" opacity="0.8"/>'+
-      '<text x="'+(padL+bw+4)+'" y="'+(y+barH-2)+'" font-size="8" fill="#444">'+p.runs+' runs</text>';
+  var W=520, rowH=42, padT=10, padB=6;
+  var H=padT+parts.length*rowH+padB;
+  var cx=W/2, halfMax=148;
+  var maxC=1;
+  parts.forEach(function(p){ maxC=Math.max(maxC, p.b1.runs, p.b2.runs); });
+  var c1=color1||'#1565c0', c2=color2||'#2e7d32';
+  function trunc(n){ n=n||'—'; return escapeHtml(n.length>14?n.slice(0,13)+'…':n); }
+  var rows=parts.map(function(p,i){
+    var top=padT+i*rowH, yT=top+14, yB=top+22, barH=12;
+    var lw=Math.max(1,(p.b1.runs/maxC)*halfMax);
+    var rw=Math.max(1,(p.b2.runs/maxC)*halfMax);
+    return '<text x="'+(cx-halfMax-10)+'" y="'+yT+'" text-anchor="end" font-size="10" font-weight="600" fill="#333">'+trunc(p.b1.name)+'</text>'+
+      '<text x="'+cx+'" y="'+yT+'" text-anchor="middle" font-size="13" font-weight="800" fill="#111">'+p.runs+'</text>'+
+      '<text x="'+(cx+halfMax+10)+'" y="'+yT+'" text-anchor="start" font-size="10" font-weight="600" fill="#333">'+trunc(p.b2.name)+'</text>'+
+      '<rect x="'+(cx-lw).toFixed(1)+'" y="'+yB+'" width="'+lw.toFixed(1)+'" height="'+barH+'" fill="'+c1+'" opacity="0.85" rx="1.5"><title>'+escapeHtml(p.b1.name)+': '+p.b1.runs+'</title></rect>'+
+      '<rect x="'+cx+'" y="'+yB+'" width="'+rw.toFixed(1)+'" height="'+barH+'" fill="'+c2+'" opacity="0.85" rx="1.5"><title>'+escapeHtml(p.b2.name)+': '+p.b2.runs+'</title></rect>'+
+      '<text x="'+(cx-lw-4)+'" y="'+(yB+barH-2)+'" text-anchor="end" font-size="8" fill="#666">'+p.b1.runs+'</text>'+
+      '<text x="'+(cx+rw+4)+'" y="'+(yB+barH-2)+'" text-anchor="start" font-size="8" fill="#666">'+p.b2.runs+'</text>'+
+      '<text x="'+(cx+halfMax+10)+'" y="'+(yB+barH-1)+'" text-anchor="start" font-size="7" fill="#aaa">'+_ordinal(p.wkt||i+1)+' wkt</text>';
   }).join('');
-  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:420px">'+bars+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:520px">'+
+    '<line x1="'+cx+'" y1="'+padT+'" x2="'+cx+'" y2="'+(H-padB)+'" stroke="#e0e0e0" stroke-width="1"/>'+
+    rows+'</svg>';
 }
 
 /* ── Print CSS ─────────────────────────────────────────────────────── */
@@ -465,7 +474,7 @@ function _buildScorecard(matchObj, s1, s2, b1, bw1, fow1, b2, bw2, fow2, bo1, bo
 }
 
 /* ── Charts page builder ─────────────────────────────────────────── */
-function _buildChartsHTML(matchObj, s1, s2, oh1, oh2, fow1, fow2, b1, bw1, bo1, b2, bw2, bo2){
+function _buildChartsHTML(matchObj, s1, s2, oh1, oh2, fow1, fow2, b1, bw1, bo1, b2, bw2, bo2, pnr1, pnr2){
   var bat1=matchObj.batFirst, bat2=bat1===matchObj.team1?matchObj.team2:matchObj.team1;
   var totalOvers=matchObj.overs||20;
   var html='<div class="page-break"></div>';
@@ -504,14 +513,10 @@ function _buildChartsHTML(matchObj, s1, s2, oh1, oh2, fow1, fow2, b1, bw1, bo1, 
   var ext=_chartExtras(s1,s2,bat1,bat2);
   if(ext){ html+='<h3 class="chart-title">Extras Breakdown</h3><div class="chart-wrap">'+ext+'</div>'; }
 
-  if(fow1&&fow1.length){
-    var ps1=_chartPartnerships(fow1,b1,bo1,s1.runs,'#1565c0');
-    if(ps1){ html+='<h3 class="chart-title">Partnerships — '+escapeHtml(bat1)+'</h3><div class="chart-wrap">'+ps1+'</div>'; }
-  }
-  if(fow2&&fow2.length){
-    var ps2=_chartPartnerships(fow2,b2,bo2,s2.runs,'#2e7d32');
-    if(ps2){ html+='<h3 class="chart-title">Partnerships — '+escapeHtml(bat2)+'</h3><div class="chart-wrap">'+ps2+'</div>'; }
-  }
+  var ps1=_chartPartnerships(pnr1,'#1565c0','#5e92d0');
+  if(ps1){ html+='<h3 class="chart-title">Partnerships — '+escapeHtml(bat1)+'</h3><div class="chart-wrap">'+ps1+'</div>'; }
+  var ps2=_chartPartnerships(pnr2,'#2e7d32','#66a86b');
+  if(ps2){ html+='<h3 class="chart-title">Partnerships — '+escapeHtml(bat2)+'</h3><div class="chart-wrap">'+ps2+'</div>'; }
 
   html+='<div class="credit">&#9733; CA Bijay Pokhrel</div>';
   return html;
@@ -564,6 +569,20 @@ function printOverlay(html){
   overlay.scrollTop=0;
 }
 
+/* Build partnerships for the in-progress innings, including the current
+   unbroken stand (which has not yet been pushed into S.partnerships). */
+function _livePartnerships(){
+  var arr=(S.partnerships||[]).slice();
+  if((S.partnershipRuns||0)>0 || (S.partnershipBalls||0)>0){
+    var a=S.strikerIdx, b=S.nonStrikerIdx, ba=S.batting[a], bb=S.batting[b];
+    var rA=(S.pnrContrib&&S.pnrContrib[a])||0, rB=(S.pnrContrib&&S.pnrContrib[b])||0;
+    arr.push({wkt:arr.length+1, runs:S.partnershipRuns, balls:S.partnershipBalls,
+      b1:{name:ba?ba.name:'', runs:rA}, b2:{name:bb?bb.name:'', runs:rB},
+      extras:Math.max(0,S.partnershipRuns-rA-rB)});
+  }
+  return arr;
+}
+
 /* ── Public: export from live match ─────────────────────────────── */
 function exportPDF(){
   var isResult=S.phase==='result';
@@ -580,8 +599,10 @@ function exportPDF(){
   var bwo1=S.inn1bowlingOrder.length?S.inn1bowlingOrder:S.bowlingOrder;
   var oh1=S.inn1overHistory.length?S.inn1overHistory:S.overHistory;
   var oh2=isInn2?S.overHistory:[];
+  var pnr1=isInn2?(S.inn1partnerships||[]):_livePartnerships();
+  var pnr2=isInn2?_livePartnerships():[];
   var scorecard=_buildScorecard(S.match,s1,s2,b1,bw1,fow1,b2,bw2,fow2,bo1,S.battingOrder,bwo1,S.bowlingOrder,isResult);
-  var charts=_buildChartsHTML(S.match,s1,s2,oh1,oh2,fow1,fow2,b1,bw1,bo1,b2,bw2,S.battingOrder);
+  var charts=_buildChartsHTML(S.match,s1,s2,oh1,oh2,fow1,fow2,b1,bw1,bo1,b2,bw2,S.battingOrder,pnr1,pnr2);
   printOverlay(scorecard+charts);
 }
 
@@ -601,7 +622,8 @@ function printHistoryMatch(idx){
     m.inn1overHistory||[],m.inn2overHistory||[],
     m.inn1fow||[],m.inn2fow||[],
     m.inn1batting||[],m.inn1bowling||[],m.inn1battingOrder||[],
-    m.inn2batting||[],m.inn2bowling||[],m.inn2battingOrder||[]);
+    m.inn2batting||[],m.inn2bowling||[],m.inn2battingOrder||[],
+    m.inn1partnerships||[],m.inn2partnerships||[]);
   printOverlay(scorecard+charts);
 }
 

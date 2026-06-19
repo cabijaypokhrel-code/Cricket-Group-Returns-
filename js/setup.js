@@ -142,6 +142,7 @@ function _resetMatchState(){
   S.strikerIdx=0; S.nonStrikerIdx=1; S.bowlerIdx=0;
   S.thisBalls=[]; S.overHistory=[]; S.fow=[]; S.partnershipBreaks=[];
   S.partnershipRuns=0; S.partnershipBalls=0;
+  S.partnerships=[]; S.inn1partnerships=[]; S.pnrContrib={};
   S.wicketPending=false; S.outIdx=-1;
   S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null; S.activeTab='live';
   S.snapshots=[]; S.inn1batting=[]; S.inn1bowling=[]; S.inn1fow=[]; S.inn1overHistory=[]; S.inn1overBowlers=[]; S.inn1score=null;
