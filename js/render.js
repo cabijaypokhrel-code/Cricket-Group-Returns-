@@ -532,8 +532,6 @@ function renderScoring(){
     if(S.editStriker){
       var allBatChips = S.batting.map(function(b,i){
         if(b.out) return null;
-        // Only show players who are currently at the crease or have already batted
-        if(S.battingOrder.indexOf(i)<0) return null;
         return '<button class="bowler-chip" style="border-color:#9FE1CB;background:#E1F5EE;margin-bottom:2px" data-action="pick-striker" data-val="'+i+'">'+
           '<span class="chip-name">'+b.name+'</span>'+
           '<span class="chip-stat">'+(b.balls>0?b.runs+'r ('+b.balls+'b)':'yet to bat')+'</span>'+
