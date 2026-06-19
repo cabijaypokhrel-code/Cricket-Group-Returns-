@@ -35,7 +35,8 @@ function _buildSaveData(){
       dismissalType:S.dismissalType, confirmEndInnings:S.confirmEndInnings,
       inn1Complete:S.inn1Complete, freeHit:S.freeHit, overSummary:S.overSummary||null,
       partnershipRuns:S.partnershipRuns, partnershipBalls:S.partnershipBalls,
-      partnershipBreaks:S.partnershipBreaks
+      partnershipBreaks:S.partnershipBreaks,
+      partnerships:S.partnerships, inn1partnerships:S.inn1partnerships, pnrContrib:S.pnrContrib
     },
     savedAt: new Date().toLocaleString()
   };
@@ -108,7 +109,9 @@ function saveMatchToHistory(){
       inn1overHistory:JSON.parse(JSON.stringify(S.inn1overHistory||[])),
       inn2overHistory:JSON.parse(JSON.stringify((S.innings===2||S.phase==='result')?S.overHistory:[])),
       inn1overBowlers:(S.inn1overBowlers||[]).slice(),
-      inn2overBowlers:(S.innings===2||S.phase==='result'?S.overBowlers:[]).slice()
+      inn2overBowlers:(S.innings===2||S.phase==='result'?S.overBowlers:[]).slice(),
+      inn1partnerships:JSON.parse(JSON.stringify(S.inn1partnerships||[])),
+      inn2partnerships:JSON.parse(JSON.stringify((S.innings===2||S.phase==='result')?(S.partnerships||[]):[]))
     };
     var history=getMatchHistory();
     history.unshift(entry);

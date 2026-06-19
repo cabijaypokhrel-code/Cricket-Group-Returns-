@@ -1,3 +1,30 @@
+/* ── Partnership contribution tracking ──────────────────────────────
+   Credits runs to the batsman who scored them within the current
+   partnership, and records each completed partnership (with both
+   batsmen and their individual contributions) for the report charts. */
+function _pnrCredit(idx, r){
+  if(!S.pnrContrib) S.pnrContrib={};
+  S.pnrContrib[idx]=(S.pnrContrib[idx]||0)+r;
+}
+function _pnrPush(){
+  if(!S.partnerships) S.partnerships=[];
+  if(!S.pnrContrib) S.pnrContrib={};
+  var total=S.partnershipRuns||0;
+  if(total<=0 && (S.partnershipBalls||0)<=0){ S.pnrContrib={}; return; }
+  var a=S.strikerIdx, b=S.nonStrikerIdx;
+  var ba=S.batting[a], bb=S.batting[b];
+  var rA=S.pnrContrib[a]||0, rB=S.pnrContrib[b]||0;
+  S.partnerships.push({
+    wkt:S.partnerships.length+1,
+    runs:total, balls:S.partnershipBalls||0,
+    b1:{name:ba?ba.name:'', runs:rA},
+    b2:{name:bb?bb.name:'', runs:rB},
+    extras:Math.max(0,total-rA-rB)
+  });
+  S.pnrContrib={};
+}
+function _pnrReset(){ S.partnershipRuns=0; S.partnershipBalls=0; }
+
 function doRuns(r){
   saveSnapshot();
   S.freeHit=false;
@@ -8,7 +35,7 @@ function doRuns(r){
   if(r===4) b.fours++;
   if(r===6) b.sixes++;
   S.thisBalls.push(String(r));
-  S.partnershipRuns+=r; S.partnershipBalls++;
+  S.partnershipRuns+=r; S.partnershipBalls++; _pnrCredit(S.strikerIdx, r);
   // Team milestone toasts
   var prevTeamRuns=s.runs-r;
   [50,100,150,200,250,300].forEach(function(m){ if(prevTeamRuns<m && s.runs>=m) showTeamMilestone(sc(), m); });
@@ -39,7 +66,7 @@ function doNoBall(extra){
   S.freeHit=true;
   var s=sc(), b=bat(), w=bowl(), total=1+extra;
   s.runs+=total; s.nb+=1; w.runs+=total;
-  if(extra>0){ b.runs+=extra; }
+  if(extra>0){ b.runs+=extra; _pnrCredit(S.strikerIdx, extra); }
   S.partnershipRuns+=total;
   S.thisBalls.push(extra>0?'NB+'+extra:'NB');
   if(extra%2===1) swap();
@@ -140,6 +167,7 @@ function confirmDismissal(type){
     if(roRuns>0){
       s.runs+=roRuns; w.runs+=roRuns;
       bat().runs+=roRuns;
+      S.partnershipRuns+=roRuns; _pnrCredit(S.strikerIdx, roRuns);
       if(roRuns===4) bat().fours++;
     }
     var roBallEntry=roRuns>0?(roRuns+'W'):'W';
@@ -150,6 +178,7 @@ function confirmDismissal(type){
     S.thisBalls.push(roBallEntry);
     s.balls++; w.balls++; bat().balls++;
     S.dismissalPending=false; S.dismissalType='';
+    _pnrPush(); _pnrReset();
     if(s.wickets>=10){ endInnings(); return; }
     S.wicketPending=true; S.outIdx=roOutIdx;
     if(legalCount()>=6){ S.overHistory.push(S.thisBalls.slice()); S.overBowlers.push(bowl().name); bowl().overs++; S.thisBalls=[]; S.thisBallsRunout=[]; S.overDone=true; if(S.overHistory.length>=S.match.overs){ endInnings(); return; } }
@@ -165,6 +194,7 @@ function confirmDismissal(type){
     var rb=bat();
     rb.retiredHurt=true;
     S.partnershipBreaks.push({score:s.runs, balls:s.balls});
+    _pnrPush(); _pnrReset();
     S.dismissalPending=false; S.dismissalType='';
     S.wicketPending=true; S.outIdx=S.strikerIdx;
     render(); return;
@@ -174,6 +204,7 @@ function confirmDismissal(type){
     s.wickets++;
     S.fow.push({score:s.runs,wkts:s.wickets,name:rb2.name,over:overs(s)});
     S.dismissalPending=false; S.dismissalType='';
+    _pnrPush(); _pnrReset();
     S.wicketPending=true; S.outIdx=S.strikerIdx;
     S.thisBalls.push('W');
     s.balls++; w.balls++; rb2.balls++;
@@ -186,7 +217,7 @@ function confirmDismissal(type){
   S.thisBalls.push('W');
   s.balls++; w.balls++; b.balls++;
   S.dismissalPending=false; S.dismissalType='';
-  S.partnershipRuns=0; S.partnershipBalls=0;
+  _pnrPush(); S.partnershipRuns=0; S.partnershipBalls=0;
   // Hat-trick check for bowler
   checkHatTrick(w);
   if(s.wickets>=10){ endInnings(); return; }
@@ -210,7 +241,9 @@ function endOver(){
 
 function endInnings(){
   S.confirmEndInnings=false;
+  _pnrPush(); _pnrReset();
   if(S.innings===1){
+    S.inn1partnerships=JSON.parse(JSON.stringify(S.partnerships||[]));
     S.inn1batting=JSON.parse(JSON.stringify(S.batting));
     S.inn1bowling=JSON.parse(JSON.stringify(S.bowling));
     S.inn1fow=JSON.parse(JSON.stringify(S.fow));
@@ -247,6 +280,7 @@ function startInn2(){
   S.openersNeeded=true;
   S.thisBalls=[]; S.overHistory=[]; S.overBowlers=[]; S.fow=[]; S.partnershipBreaks=[];
   S.partnershipRuns=0; S.partnershipBalls=0;
+  S.partnerships=[]; S.pnrContrib={};
   S.wicketPending=false; S.overDone=false; S.editStriker=false; S.editBowler=false; S.extrasPanel=null;
   S.snapshots=[]; S.bowlerConfirmed=false; S.dismissalPending=false; S.dismissalType=''; S.thisBallsRunout=[]; S.freeHit=false;
   render();

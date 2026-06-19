@@ -8,6 +8,7 @@ var S = {
   strikerIdx:0,nonStrikerIdx:1,bowlerIdx:0,
   thisBalls:[],overHistory:[],overBowlers:[],fow:[],partnershipBreaks:[],
   partnershipRuns:0,partnershipBalls:0,
+  partnerships:[],inn1partnerships:[],pnrContrib:{},
   wicketPending:false,outIdx:-1,
   overDone:false,
   editStriker:false,editBowler:false,
@@ -38,7 +39,8 @@ function saveSnapshot(){
     wicketPending:S.wicketPending,outIdx:S.outIdx,
     overDone:S.overDone,innings:S.innings,
     freeHit:S.freeHit,
-    partnershipRuns:S.partnershipRuns,partnershipBalls:S.partnershipBalls
+    partnershipRuns:S.partnershipRuns,partnershipBalls:S.partnershipBalls,
+    partnerships:S.partnerships,pnrContrib:S.pnrContrib
   }));
   if(S.snapshots.length>50) S.snapshots.shift();
 }
@@ -53,6 +55,7 @@ function undoLast(){
   S.wicketPending=prev.wicketPending; S.outIdx=prev.outIdx;
   S.overDone=prev.overDone; S.innings=prev.innings;
   S.partnershipRuns=prev.partnershipRuns||0; S.partnershipBalls=prev.partnershipBalls||0;
+  S.partnerships=prev.partnerships||[]; S.pnrContrib=prev.pnrContrib||{};
   S.battingOrder=prev.battingOrder||S.battingOrder;
   S.bowlingOrder=prev.bowlingOrder||S.bowlingOrder;
   S.extrasPanel=null; S.editStriker=false; S.editBowler=false; S.confirmEndInnings=false; S.freeHit=prev.freeHit||false;
