@@ -150,8 +150,8 @@ function _chartWorm(oh1, oh2, fow1, fow2, s1, s2, name1, name2, totalOvers){
     (cum2.length?'<circle cx="'+(pad.l+6+90)+'" cy="12" r="5" fill="'+c2+'"/><text x="'+(pad.l+14+90)+'" y="16" font-size="9" font-weight="700" fill="'+c2+'">'+escapeHtml(name2)+'</text>':'');
   return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:520px">'+
     grid+axes+xLabels+legend+
-    makePath(cum1,c1,2.2)+
-    (cum2.length?makePath(cum2,c2,2.2):'')+
+    makePath(cum1,c1,2.6)+
+    (cum2.length?makePath(cum2,c2,2.6):'')+
     fowDots(fow1,cum1,c1)+
     (cum2.length?fowDots(fow2,cum2,c2):'')+
     '<text x="'+(pad.l-28)+'" y="'+(pad.t+innerH/2)+'" text-anchor="middle" font-size="9" fill="#777" transform="rotate(-90,'+(pad.l-28)+','+(pad.t+innerH/2)+')">RUNS</text>'+
@@ -159,8 +159,8 @@ function _chartWorm(oh1, oh2, fow1, fow2, s1, s2, name1, name2, totalOvers){
     '</svg>';
 }
 
-/* ── Chart 3: Run Rate progression ───────────────────────────────── */
-function _chartRunRate(oh1, oh2, name1, name2, totalOvers){
+/* ── Chart 3: Run Rate — current rate + required rate (chase) ─────── */
+function _chartRunRate(oh1, oh2, name1, name2, totalOvers, s1){
   var runs1=_overRunsArr(oh1), runs2=_overRunsArr(oh2);
   if(!runs1.length) return '';
   function rrArr(runs){
@@ -169,7 +169,19 @@ function _chartRunRate(oh1, oh2, name1, name2, totalOvers){
     return arr;
   }
   var rr1=rrArr(runs1), rr2=rrArr(runs2);
-  var allRR=rr1.concat(rr2).concat([1]);
+  // Required run rate for the chasing side, over by over
+  var target=(s1&&s1.runs!=null)?s1.runs+1:null;
+  var rrr=[];
+  if(rr2.length && target){
+    var cumR2=0;
+    runs2.forEach(function(r,i){
+      cumR2+=r;
+      var rem=totalOvers-(i+1);
+      if(rem>0){ rrr.push(Math.max(0,(target-cumR2)/rem)); }
+      else { rrr.push(null); }
+    });
+  }
+  var allRR=rr1.concat(rr2).concat(rrr.filter(function(x){return x!=null;})).concat([1]);
   var maxRR=Math.ceil(Math.max.apply(null,allRR)/2)*2+1;
   var W=520, H=150, pad={t:24,r:16,b:30,l:34};
   var innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
@@ -182,24 +194,27 @@ function _chartRunRate(oh1, oh2, name1, name2, totalOvers){
     grid+='<line x1="'+pad.l+'" y1="'+yy+'" x2="'+(W-pad.r)+'" y2="'+yy+'" stroke="#eeeeee" stroke-width="0.7"/>'+
       '<text x="'+(pad.l-4)+'" y="'+(parseFloat(yy)+3)+'" text-anchor="end" font-size="8" fill="#999">'+v+'</text>';
   }
-  function makePath(arr,color){
+  function makePath(arr,color,dash){
     if(!arr.length) return '';
-    var d='M'+px(0)+','+py(arr[0]);
-    arr.forEach(function(r,i){ if(i>0) d+=' L'+px(i)+','+py(r); });
-    return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+    var d='', started=false;
+    arr.forEach(function(r,i){ if(r==null){started=false;return;} d+=(started?' L':' M')+px(i)+','+py(r); started=true; });
+    return '<path d="'+d.trim()+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(dash?' stroke-dasharray="5,4"':'')+'/>';
   }
   var xLabels='';
   for(var o=1;o<=n;o+=Math.ceil(n/8)){
     xLabels+='<text x="'+px(o-1)+'" y="'+(H-pad.b+11)+'" text-anchor="middle" font-size="8" fill="#888">'+o+'</text>';
   }
-  var c1='#1565c0', c2='#2e7d32';
-  var legend='<circle cx="'+(pad.l+5)+'" cy="10" r="4" fill="'+c1+'"/><text x="'+(pad.l+12)+'" y="14" font-size="8" fill="#333">'+escapeHtml(name1)+'</text>'+
-    (rr2.length?'<circle cx="'+(pad.l+80)+'" cy="10" r="4" fill="'+c2+'"/><text x="'+(pad.l+87)+'" y="14" font-size="8" fill="#333">'+escapeHtml(name2)+'</text>':'');
+  var c1='#1565c0', c2='#2e7d32', cR='#e53935';
+  var lx=pad.l+5;
+  var legend='<circle cx="'+lx+'" cy="10" r="4" fill="'+c1+'"/><text x="'+(lx+7)+'" y="14" font-size="8" fill="#333">'+escapeHtml(name1)+'</text>';
+  lx+=72;
+  if(rr2.length){ legend+='<circle cx="'+lx+'" cy="10" r="4" fill="'+c2+'"/><text x="'+(lx+7)+'" y="14" font-size="8" fill="#333">'+escapeHtml(name2)+'</text>'; lx+=72; }
+  if(rrr.length){ legend+='<line x1="'+lx+'" y1="10" x2="'+(lx+12)+'" y2="10" stroke="'+cR+'" stroke-width="2" stroke-dasharray="5,4"/><text x="'+(lx+16)+'" y="14" font-size="8" fill="#333">Req. rate</text>'; }
   return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block;max-width:520px">'+
     grid+xLabels+legend+
     '<line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(H-pad.b)+'" stroke="#bbb" stroke-width="1"/>'+
     '<line x1="'+pad.l+'" y1="'+(H-pad.b)+'" x2="'+(W-pad.r)+'" y2="'+(H-pad.b)+'" stroke="#bbb" stroke-width="1"/>'+
-    makePath(rr1,c1)+(rr2.length?makePath(rr2,c2):'')+
+    makePath(rr1,c1)+(rr2.length?makePath(rr2,c2):'')+(rrr.length?makePath(rrr,cR,true):'')+
     '</svg>';
 }
 
@@ -486,11 +501,8 @@ function _buildChartsHTML(matchObj, s1, s2, oh1, oh2, fow1, fow2, b1, bw1, bo1, 
   var worm=_chartWorm(oh1,oh2,fow1,fow2,s1,s2,bat1,bat2,totalOvers);
   if(worm){ html+='<h3 class="chart-title">Cumulative Score (Worm)</h3><div class="chart-wrap">'+worm+'</div>'; }
 
-  var rr=_chartRunRate(oh1,oh2,bat1,bat2,totalOvers);
-  if(rr){ html+='<h3 class="chart-title">Run Rate Progression</h3><div class="chart-wrap">'+rr+'</div>'; }
-
-  var wkt=_chartWicketsTimeline(fow1,fow2,s1,s2,bat1,bat2);
-  if(wkt){ html+='<h3 class="chart-title">Wickets Timeline</h3><div class="chart-wrap">'+wkt+'</div>'; }
+  var rr=_chartRunRate(oh1,oh2,bat1,bat2,totalOvers,s1);
+  if(rr){ html+='<h3 class="chart-title">Run Rate'+(oh2&&oh2.length?' &amp; Required Rate':'')+'</h3><div class="chart-wrap">'+rr+'</div>'; }
 
   if(b1&&b1.length){
     var bc1=_chartBatterContrib(b1,bo1,bat1,'#1565c0');
